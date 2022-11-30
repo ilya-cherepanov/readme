@@ -14,7 +14,7 @@ export class UserEntity implements User {
      this.fillEntity(user);
   }
 
-  public toObject(): object {
+  public toObject(): User {
     return {...this};
   }
 
