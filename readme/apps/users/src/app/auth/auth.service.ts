@@ -16,8 +16,14 @@ export class AuthService {
       throw new Error(AUTH_USER_EXISTS);
     }
 
-    const newUserEntity = await (new UserEntity({name, email, password: ''}))
-      .setPassword(password)
+    const newUserEntity = await (new UserEntity({
+      name,
+      email,
+      password: '',
+      subscribers: 0,
+      posts: 0,
+      createdAt: new Date(),
+    })).setPassword(password);
 
     return this.userRepository.create(newUserEntity);
   }
@@ -35,5 +41,14 @@ export class AuthService {
     }
 
     return userEntity.toObject();
+  }
+
+  async get(id: string) {
+    const existingUser = this.userRepository.findById(id);
+    if (!existingUser) {
+      throw new Error(AUTH_USER_NOT_FOUND);
+    }
+
+    return existingUser;
   }
 }

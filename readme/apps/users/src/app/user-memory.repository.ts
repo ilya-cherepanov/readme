@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CRUDRepository } from '@readme/core';
 import { User } from '@readme/shared-types';
 import { UserEntity } from './user.entity';
+import * as crypto from 'crypto';
 
 
 @Injectable()
@@ -27,7 +28,7 @@ export class UserMemoryRepository implements CRUDRepository<UserEntity, string, 
     const existUser = Object.values(this.repository)
       .find((userItem) => userItem.email === email);
 
-    if (! existUser) {
+    if (!existUser) {
       return null;
     }
 

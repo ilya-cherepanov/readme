@@ -3,5 +3,8 @@ export interface User {
   email: string;
   password: string;
   name: string;
+  posts: number;
+  subscribers: number;
+  createdAt: Date;
   avatar?: string;
 }
