@@ -2,9 +2,11 @@ import { CRUDRepository } from '@readme/core';
 import { CommentEntity } from './comment.entity';
 import { Comment } from '@readme/shared-types';
 import * as crypto from 'crypto';
+import { Injectable } from '@nestjs/common';
 
 
-export class CommentsMemoryRepository implements CRUDRepository<CommentEntity, string, Comment> {
+@Injectable()
+export class CommentMemoryRepository implements CRUDRepository<CommentEntity, string, Comment> {
   private repository: Record<string, Comment> = {};
 
   public async create(item: CommentEntity): Promise<Comment> {
