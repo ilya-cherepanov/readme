@@ -6,6 +6,7 @@ export class CommentEntity implements Comment {
   text: string;
   authorId: string;
   postId: string;
+  createdAt: Date;
 
   constructor(comment: Comment) {
      this.fillEntity(comment);
@@ -20,5 +21,6 @@ export class CommentEntity implements Comment {
     this.text = comment.text;
     this.authorId = comment.authorId;
     this.postId = comment.postId;
+    this.createdAt = comment.createdAt;
   }
 }
