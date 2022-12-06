@@ -1,0 +1,134 @@
+# Get posts
+GET http://localhost:3333/api/ HTTP/1.1
+Content-Type: application/json
+
+###
+
+# Create text post
+POST http://localhost:3333/api/text HTTP/1.1
+Content-Type: application/json
+
+{
+  "creatorId": "e203b269-4b66-4e3f-acd3-7ce25e9828f6",
+  "title": "Hello",
+  "text": "Hello, World",
+  "previewText": "Hello"
+}
+
+###
+
+# Update text post
+PATCH http://localhost:3333/api/text/ac623311-9728-4974-946e-0fb886e97fc5 HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "Hello Hello",
+  "text": "Hello, World",
+  "previewText": "Hello"
+}
+
+###
+
+# Create video post
+POST http://localhost:3333/api/video HTTP/1.1
+Content-Type: application/json
+
+{
+  "creatorId": "e203b269-4b66-4e3f-acd3-7ce25e9828f6",
+  "title": "Holidays!",
+  "video": "/posts/videos/ac623311-9728-4974-946e-0fb886e97fc5"
+}
+
+###
+
+# Update video post
+PATCH http://localhost:3333/api/video/ac623311-9728-4974-946e-0fb886e97fc5 HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "Holidays!!!",
+  "video": "/posts/videos/ac623311-9728-4974-946e-0fb886e97fc5"
+}
+
+###
+
+# Create photo post
+POST http://localhost:3333/api/photo HTTP/1.1
+Content-Type: application/json
+
+{
+  "creatorId": "e203b269-4b66-4e3f-acd3-7ce25e9828f6",
+  "photo": "/posts/photos/ac623311-9728-4974-946e-0fb886e97fc5"
+}
+
+###
+
+# Update photo post
+PATCH http://localhost:3333/api/photo/ac623311-9728-4974-946e-0fb886e97fc5 HTTP/1.1
+Content-Type: application/json
+
+{
+  "photo": "/posts/photos/ac623311-9728-4974-946e-0fb886e97fcc"
+}
+
+###
+
+# Create quote post
+POST http://localhost:3333/api/quote HTTP/1.1
+Content-Type: application/json
+
+{
+  "creatorId": "e203b269-4b66-4e3f-acd3-7ce25e9828f6",
+  "text": "With software there are only two possibilities: either the users control the programme or the programme controls the users. If the programme controls the users, and the developer controls the programme, then the programme is an instrument of unjust power.",
+  "quoteAuthor": "Richard Stallman"
+}
+
+###
+
+# Update quote post
+PATCH http://localhost:3333/api/quote/7c6683f6-8aa7-4700-b0da-a411c4972fb4 HTTP/1.1
+Content-Type: application/json
+
+{
+  "text": "With With software there are only two possibilities: either the users control the programme or the programme controls the users. If the programme controls the users, and the developer controls the programme, then the programme is an instrument of unjust power."
+}
+
+###
+
+# Create link post
+POST http://localhost:3333/api/link HTTP/1.1
+Content-Type: application/json
+
+{
+  "creatorId": "e203b269-4b66-4e3f-acd3-7ce25e9828f6",
+  "link": "http://site.com/content/some-content",
+  "description": "Информация о скидках"
+}
+
+###
+
+# Update link post
+PATCH http://localhost:3333/api/link/ac623311-9728-4974-946e-0fb886e97fc5 HTTP/1.1
+Content-Type: application/json
+
+{
+  "link": "https://site.com/content/some-content",
+  "description": "Информация о скидках"
+}
+
+###
+
+# Delete post
+DELETE http://localhost:3333/api/c6c5953b-02ba-46eb-a94c-04d540e78d26 HTTP/1.1
+Content-Type: application/json
+
+###
+
+# Repost post
+POST http://localhost:3333/api/repost HTTP/1.1
+Content-Type: application/json
+
+{
+  "postId": "1ddad4d0-d94a-4026-ac66-8164dd6315ae",
+  "userId": "e203b269-4b66-4e3f-acd3-7ce25e982810"
+}
