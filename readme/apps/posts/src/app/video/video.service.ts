@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PostCategory, PostStatus } from '@readme/shared-types';
-import { isVideoPost } from '../../../../../libs/shared-types/src/lib/post-guards';
+import { PostCategory, PostStatus, isVideoPost } from '@readme/shared-types';
 import { VideoPostEntity } from '../post.entity';
 import { PostMemoryRepository } from '../general/post.repository';
 import { CreateVideoPostDTO } from './dto/create-video-post.dto';

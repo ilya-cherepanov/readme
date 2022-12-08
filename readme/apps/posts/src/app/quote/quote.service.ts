@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PostCategory, PostStatus } from '@readme/shared-types';
-import { isQuotePost } from '../../../../../libs/shared-types/src/lib/post-guards';
+import { PostCategory, PostStatus, isQuotePost } from '@readme/shared-types';
 import { QuotePostEntity } from '../post.entity';
 import { PostMemoryRepository } from '../general/post.repository';
 import { CreateQuotePostDTO } from './dto/create-quote-post.dto';

@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PostCategory, PostStatus } from '@readme/shared-types';
-import { isPhotoPost } from '../../../../../libs/shared-types/src/lib/post-guards';
+import { PostCategory, PostStatus, isPhotoPost } from '@readme/shared-types';
 import { PhotoPostEntity } from '../post.entity';
 import { PostMemoryRepository } from '../general/post.repository';
 import { CreatePhotoPostDTO } from './dto/create-photo-post.dto';

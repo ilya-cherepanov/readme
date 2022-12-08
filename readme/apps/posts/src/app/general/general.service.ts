@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Post } from '@readme/shared-types';
-import { isLinkPost, isPhotoPost, isQuotePost, isTextPost, isVideoPost } from '../../../../../libs/shared-types/src/lib/post-guards';
+import { Post, isLinkPost, isPhotoPost, isQuotePost, isTextPost, isVideoPost } from '@readme/shared-types';
 import { LinkPostEntity, PhotoPostEntity, PostEntity, QuotePostEntity, TextPostEntity, VideoPostEntity } from '../post.entity';
 import { PostMemoryRepository } from './post.repository';
 import { RepostPostDTO } from './dto/repost-post.dto';

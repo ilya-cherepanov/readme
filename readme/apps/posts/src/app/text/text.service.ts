@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PostCategory, PostStatus } from '@readme/shared-types';
-import { isTextPost } from '../../../../../libs/shared-types/src/lib/post-guards';
+import { PostCategory, PostStatus, isTextPost } from '@readme/shared-types';
 import { TextPostEntity } from '../post.entity';
 import { PostMemoryRepository } from '../general/post.repository';
 import { CreateTextPostDTO } from './dto/create-text-post.dto';
