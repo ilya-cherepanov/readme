@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Expose } from "class-transformer";
+import { Expose, Transform } from "class-transformer";
 
 
 export class LoggedUserRDO {
@@ -8,6 +8,7 @@ export class LoggedUserRDO {
     example: '3ee6104d-1c23-4be6-827a-f0bd350b423c',
   })
   @Expose({name: '_id'})
+  @Transform((value) => value.obj._id.toString())
   public id: string;
 
   @ApiProperty({

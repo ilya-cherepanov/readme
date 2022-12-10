@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { UserMemoryRepository } from '../user-memory.repository';
 import { UserEntity } from '../user.entity';
+import { UserRepository } from '../user.repository';
 import { AUTH_USER_EXISTS, AUTH_USER_NOT_FOUND, AUTH_USER_PASSWORD_WRONG } from './auth.constants';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { LoginUserDTO } from './dto/login-user.dto';
@@ -8,7 +8,7 @@ import { LoginUserDTO } from './dto/login-user.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userRepository: UserMemoryRepository) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
   async register({name, email, password}: CreateUserDTO) {
     const existsUser = await this.userRepository.findByEmail(email);
@@ -44,7 +44,7 @@ export class AuthService {
   }
 
   async get(id: string) {
-    const existingUser = this.userRepository.findById(id);
+    const existingUser = await this.userRepository.findById(id);
     if (!existingUser) {
       throw new Error(AUTH_USER_NOT_FOUND);
     }

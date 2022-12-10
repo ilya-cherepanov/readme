@@ -12,7 +12,7 @@ services:
     ports:
       - 27017:27017
     volumes:
-      - ./db:/data/db
+      - ${USERS_DB_DIR:-../../../db}:/data/db
 
   mongodb-express:
     image: mongo-express
