@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PostCategory, PostStatus, isLinkPost } from '@readme/shared-types';
 import { LinkPostEntity } from '../post.entity';
-import { PostMemoryRepository } from '../general/post.repository';
 import { CreateLinkPostDTO } from './dto/create-link-post.dto';
 import { UpdateLinkPostDTO } from './dto/update-link-post.dto';
+import { PostRepository } from '../general/post.repository';
 
 
 @Injectable()
 export class LinkService {
-  constructor(private readonly postRepository: PostMemoryRepository) {}
+  constructor(private readonly postRepository: PostRepository) {}
 
   async create(dto: CreateLinkPostDTO) {
     const newLinkPostEntity = new LinkPostEntity({
@@ -24,7 +24,7 @@ export class LinkService {
     return this.postRepository.create(newLinkPostEntity);
   }
 
-  async update(id: string, dto: UpdateLinkPostDTO) {
+  async update(id: number, dto: UpdateLinkPostDTO) {
     const existingPost = await this.postRepository.findById(id);
 
     if (!existingPost) {

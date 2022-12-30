@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Post, isLinkPost, isPhotoPost, isQuotePost, isTextPost, isVideoPost } from '@readme/shared-types';
 import { LinkPostEntity, PhotoPostEntity, PostEntity, QuotePostEntity, TextPostEntity, VideoPostEntity } from '../post.entity';
-import { PostMemoryRepository } from './post.repository';
+import { LikePostDTO } from './dto/like-post.dto';
 import { RepostPostDTO } from './dto/repost-post.dto';
+import { PostRepository } from './post.repository';
 
 @Injectable()
 export class GeneralService {
-  constructor(private readonly postRepository: PostMemoryRepository) {}
+  constructor(private readonly postRepository: PostRepository) {}
 
   async get() {
     return this.postRepository.findAllPublished();
@@ -23,10 +24,11 @@ export class GeneralService {
       throw new Error('User with given ID is creator of the post!');
     }
 
-    const originalPostId = existingPost.isRePost ? existingPost.originalPostId : existingPost._id;
+    const originalPostId = existingPost.isRePost ? existingPost.originalPostId : existingPost.id;
 
     const newPost: Post = {
       ...existingPost,
+      id: undefined,
       isRePost: true,
       originalPostId,
       authorId: dto.userId,
@@ -51,7 +53,17 @@ export class GeneralService {
     return this.postRepository.create(newPostEntity);
   }
 
-  async delete(id: string) {
+  async setLike(dto: LikePostDTO, state: boolean) {
+    if (state) {
+      await this.postRepository.createLike(dto.postId, dto.userId);
+    } else {
+      await this.postRepository.deleteLike(dto.postId, dto.userId);
+    }
+
+    return this.postRepository.findById(dto.postId);
+  }
+
+  async delete(id: number) {
     const existingPost = this.postRepository.findById(id);
 
     if (!existingPost) {

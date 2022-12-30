@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PostCategory, PostStatus, isQuotePost } from '@readme/shared-types';
 import { QuotePostEntity } from '../post.entity';
-import { PostMemoryRepository } from '../general/post.repository';
 import { CreateQuotePostDTO } from './dto/create-quote-post.dto';
 import { UpdateQuotePostDTO } from './dto/update-quote-post.dto';
+import { PostRepository } from '../general/post.repository';
 
 
 @Injectable()
 export class QuoteService {
-  constructor(private readonly postRepository: PostMemoryRepository) {}
+  constructor(private readonly postRepository: PostRepository) {}
 
   async create(dto: CreateQuotePostDTO) {
     const newQuotePostEntity = new QuotePostEntity({
@@ -24,7 +24,7 @@ export class QuoteService {
     return this.postRepository.create(newQuotePostEntity);
   }
 
-  async update(id: string, dto: UpdateQuotePostDTO) {
+  async update(id: number, dto: UpdateQuotePostDTO) {
     const existingPost = await this.postRepository.findById(id);
 
     if (!existingPost) {

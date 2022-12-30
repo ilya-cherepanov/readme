@@ -2,7 +2,7 @@ import { BasePost, LinkPost, PhotoPost, Post, PostCategory, PostStatus, QuotePos
 
 
 abstract class BasePostEntity implements BasePost {
-  _id?: string;
+  id: number;
   creatorId: string;
   authorId: string;
   postCategory: PostCategory;
@@ -10,7 +10,7 @@ abstract class BasePostEntity implements BasePost {
   publishedAt?: Date;
   postStatus: PostStatus;
   isRePost: boolean;
-  originalPostId?: string;
+  originalPostId?: number;
   tags?: string[];
 
   constructor(post: BasePost) {
@@ -20,7 +20,7 @@ abstract class BasePostEntity implements BasePost {
   public abstract toObject(): Post;
 
   public fillEntity(post: BasePost): void {
-    this._id = post._id;
+    this.id = post.id;
     this.creatorId = post.creatorId;
     this.authorId = post.authorId;
     this.createdAt = post.createdAt;

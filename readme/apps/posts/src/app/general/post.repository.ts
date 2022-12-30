@@ -1,42 +1,100 @@
 import { Injectable } from '@nestjs/common';
 import { CRUDRepository } from '@readme/core';
-import { Post, PostStatus } from '@readme/shared-types';
-import * as crypto from 'crypto';
+import { Post, PostCategory, PostStatus } from '@readme/shared-types';
+import { PrismaService } from '../prisma/prisma.service';
 import { PostEntity } from '../post.entity';
 
 
 @Injectable()
-export class PostMemoryRepository implements CRUDRepository<PostEntity, string, Post> {
-  private repository: Record<string, Post> = {};
+export class PostRepository implements CRUDRepository<PostEntity, number, Post> {
+  constructor(private readonly prismaService: PrismaService) {}
 
-  async findById(id: string): Promise<Post | null> {
-    if (this.repository[id]) {
-      return {...this.repository[id]};
+  async findById(id: number): Promise<Post | null> {
+    const dbPost = await this.prismaService.post.findFirst({
+      where: {id},
+      include: {
+        _count: {
+          select: {likes: true},
+        },
+      },
+    });
+
+    if (!dbPost) {
+      return null;
     }
 
-    return null;
+    const post = {
+      ...dbPost,
+      postStatus: dbPost.postStatus as PostStatus,
+      postCategory: dbPost.postCategory as PostCategory,
+    };
+
+    return post;
   }
 
   async findAllPublished(): Promise<Post[]> {
-    const publishedPosts = Object.values(this.repository)
-      .filter((post) => post.postStatus === PostStatus.Published && post.isRePost === false);
+    const dbPosts = await this.prismaService.post.findMany({
+      where: {isRePost: false, postStatus: PostStatus.Published},
+      include: {
+        _count: {
+          select: {likes: true},
+        },
+      },
+    });
+
+    const publishedPosts: Post[] = dbPosts.map((dbPost) => ({
+      ...dbPost,
+      postStatus: dbPost.postStatus as PostStatus,
+      postCategory: dbPost.postCategory as PostCategory,
+    }));
 
     return publishedPosts;
   }
 
   async create(item: PostEntity): Promise<Post> {
-    const entry = {...item.toObject(), _id: crypto.randomUUID(),};
-    this.repository[entry._id] = entry;
+    const dbPost = await this.prismaService.post.create({
+      data: item.toObject(),
+      include: {
+        _count: {select: {likes: true}},
+      },
+    });
 
-    return {...entry};
+    return {
+      ...dbPost,
+      postStatus: dbPost.postStatus as PostStatus,
+      postCategory: dbPost.postCategory as PostCategory,
+    };
   }
 
-  async update(id: string, item: PostEntity): Promise<Post> {
-    this.repository[id] = {...item.toObject(), _id: id};
-    return this.findById(id);
+  async update(id: number, item: PostEntity): Promise<Post> {
+    const dbPost = await this.prismaService.post.update({
+      where: {id},
+      data: {...item.toObject()},
+      include: {
+        _count: {select: {likes: true}},
+      },
+    });
+
+    return {
+      ...dbPost,
+      postStatus: dbPost.postStatus as PostStatus,
+      postCategory: dbPost.postCategory as PostCategory,
+    };
   }
 
-  async destroy(id: string): Promise<void> {
-    delete this.repository[id];
+  async destroy(id: number): Promise<void> {
+    await this.prismaService.post.delete({where: {id}});
+  }
+
+  async createLike(postId: number, userId: string): Promise<void> {
+    await this.prismaService.like.upsert({
+      where: {postId_userId: {postId, userId}},
+      create: {postId, userId},
+      update: {postId, userId},
+    });
+  }
+
+  async deleteLike(postId: number, userId: string): Promise<void> {
+    await this.prismaService.like.deleteMany({where: {postId, userId}});
   }
 }

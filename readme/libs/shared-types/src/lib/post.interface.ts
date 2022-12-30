@@ -3,7 +3,7 @@ import { PostStatus } from "./post-status.enum";
 
 
 export interface BasePost {
-  _id?: string;
+  id?: number;
   creatorId: string;
   authorId: string;
   postCategory: PostCategory;
@@ -11,8 +11,11 @@ export interface BasePost {
   publishedAt?: Date;
   postStatus: PostStatus;
   isRePost: boolean;
-  originalPostId?: string;
+  originalPostId?: number;
   tags?: string[];
+  _count?: {
+    likes: number;
+  };
 }
 
 export interface VideoPost extends BasePost {

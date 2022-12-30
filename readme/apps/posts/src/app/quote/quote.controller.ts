@@ -1,4 +1,4 @@
-import { Body, Controller, HttpStatus, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
 import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { fillObject } from '@readme/core';
 import { PostRDO } from '../general/rdo/post.rdo';
@@ -37,7 +37,7 @@ export class QuoteController {
     status: HttpStatus.NOT_FOUND,
     description: 'Публикация не найдена!'
   })
-  async update(@Param('id') id: string, @Body() dto: UpdateQuotePostDTO) {
+  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateQuotePostDTO) {
     const updatedQuotePost = await this.quoteService.update(id, dto);
 
     return fillObject(PostRDO, updatedQuotePost);

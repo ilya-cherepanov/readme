@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PostCategory, PostStatus, isVideoPost } from '@readme/shared-types';
 import { VideoPostEntity } from '../post.entity';
-import { PostMemoryRepository } from '../general/post.repository';
 import { CreateVideoPostDTO } from './dto/create-video-post.dto';
 import { UpdateVideoPostDTO } from './dto/update-video-post.dto';
+import { PostRepository } from '../general/post.repository';
 
 
 @Injectable()
 export class VideoService {
-  constructor(private readonly postRepository: PostMemoryRepository) {}
+  constructor(private readonly postRepository: PostRepository) {}
 
   async create(dto: CreateVideoPostDTO) {
     const newVideoPostEntity = new VideoPostEntity({
@@ -24,7 +24,7 @@ export class VideoService {
     return this.postRepository.create(newVideoPostEntity);
   }
 
-  async update(id: string, dto: UpdateVideoPostDTO) {
+  async update(id: number, dto: UpdateVideoPostDTO) {
     const existingPost = await this.postRepository.findById(id);
 
     if (!existingPost) {

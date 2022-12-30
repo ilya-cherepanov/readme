@@ -1,0 +1,5 @@
+{
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\",\"paths\":{\"@readme/shared-types\":[\"libs/shared-types/src/index.ts\"]}} prisma/seed.ts"
+  }
+}

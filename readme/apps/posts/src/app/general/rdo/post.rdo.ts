@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { PostCategory, PostStatus } from "@readme/shared-types";
-import { Expose } from "class-transformer";
+import { Expose, Transform } from "class-transformer";
 
 
 export class PostRDO {
@@ -8,8 +8,8 @@ export class PostRDO {
     description: 'Уникальный ID поста',
     example: '3ee6104d-1c23-4be6-827a-f0bd350b423c',
   })
-  @Expose({name: '_id'})
-  id: string;
+  @Expose()
+  id: number;
 
   @ApiProperty({
     description: 'ID пользователя создавшего пост',
@@ -67,6 +67,7 @@ export class PostRDO {
     required: false,
   })
   @Expose()
+  @Transform(({value}) => value ?? undefined)
   originalPostId?: string;
 
   @ApiProperty({
@@ -83,6 +84,7 @@ export class PostRDO {
     required: false,
   })
   @Expose()
+  @Transform(({value}) => value ?? undefined)
   title?: string;
 
   @ApiProperty({
@@ -91,6 +93,7 @@ export class PostRDO {
     required: false,
   })
   @Expose()
+  @Transform(({value}) => value ?? undefined)
   video?: string;
 
   @ApiProperty({
@@ -99,6 +102,7 @@ export class PostRDO {
     required: false,
   })
   @Expose()
+  @Transform(({value}) => value ?? undefined)
   text?: string;
 
   @ApiProperty({
@@ -107,6 +111,7 @@ export class PostRDO {
     required: false,
   })
   @Expose()
+  @Transform(({value}) => value ?? undefined)
   previewText?: string;
 
   @ApiProperty({
@@ -115,6 +120,7 @@ export class PostRDO {
     required: false,
   })
   @Expose()
+  @Transform(({value}) => value ?? undefined)
   quoteAuthor?: string;
 
   @ApiProperty({
@@ -123,6 +129,7 @@ export class PostRDO {
     required: false,
   })
   @Expose()
+  @Transform(({value}) => value ?? undefined)
   photo?: string;
 
   @ApiProperty({
@@ -131,6 +138,7 @@ export class PostRDO {
     required: false,
   })
   @Expose()
+  @Transform(({value}) => value ?? undefined)
   link?: string;
 
   @ApiProperty({
@@ -139,5 +147,15 @@ export class PostRDO {
     required: false,
   })
   @Expose()
+  @Transform(({value}) => value ?? undefined)
   description?: string;
+
+  @ApiProperty({
+    description: 'Количество лайков',
+    example: 10,
+    required: true,
+  })
+  @Expose({name: '_count'})
+  @Transform(({value}) => value.likes)
+  likes: number
 }
