@@ -5,7 +5,7 @@ export class CommentEntity implements Comment {
   _id?: string;
   text: string;
   authorId: string;
-  postId: string;
+  postId: number;
   createdAt: Date;
 
   constructor(comment: Comment) {

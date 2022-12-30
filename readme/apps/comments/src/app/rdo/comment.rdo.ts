@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Expose } from "class-transformer";
+import { Expose, Transform } from "class-transformer";
 
 
 export class CommentRDO {
@@ -8,6 +8,7 @@ export class CommentRDO {
     example: 'e203b269-4b66-4e3f-acd3-7ce25e9828f5'
   })
   @Expose({name: '_id'})
+  @Transform(({obj}) => obj._id.toString())
   id: string;
 
   @ApiProperty({
@@ -26,10 +27,10 @@ export class CommentRDO {
 
   @ApiProperty({
     description: 'Идентификатор поста',
-    example: 'e203b269-4b66-4e3f-acd3-7ce25e9828f5'
+    example: 10
   })
   @Expose()
-  postId: string;
+  postId: number;
 
   @ApiProperty({
     description: 'Дата создания',

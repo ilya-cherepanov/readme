@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { fillObject } from '@readme/core';
 import { CommentsService } from './comments.service';
@@ -17,7 +17,7 @@ export class CommentsController {
     status: HttpStatus.OK,
     description: 'Получить комментарии для поста с соответствующим ID',
   })
-  async get(@Param('postId') postId: string, @Query('page') page = 0) {
+  async get(@Param('postId', ParseIntPipe) postId: number, @Query('page') page = 0) {
     const comments = await this.commentsService.get(postId, page);
 
     return fillObject(CommentRDO, comments);

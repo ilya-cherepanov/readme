@@ -1,5 +1,5 @@
 # Get comments by post id
-GET http://localhost:3333/api/posts/e203b269-4b66-4e3f-acd3-7ce25e9828f6 HTTP/1.1
+GET http://localhost:3333/api/posts/1 HTTP/1.1
 Content-Type: application/json
 
 ###
@@ -11,11 +11,11 @@ Content-Type: application/json
 {
   "text": "Hello, World!",
   "authorId": "e203b269-4b66-4e3f-acd3-7ce25e9828f5",
-  "postId": "e203b269-4b66-4e3f-acd3-7ce25e9828f6"
+  "postId": 1
 }
 
 ###
 
 # Delete comment
-DELETE http://localhost:3333/api/c4edfa58-1b35-4372-af9d-9915cc894c8c HTTP/1.1
+DELETE http://localhost:3333/api/63af325f6e51f446eb4ae355 HTTP/1.1
 Content-Type: application/json
