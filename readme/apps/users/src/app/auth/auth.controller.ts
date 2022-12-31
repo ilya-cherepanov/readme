@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
 import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { fillObject } from '@readme/core';
 import { AuthService } from './auth.service';
@@ -25,6 +25,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   @ApiResponse({
     type: LoggedUserRDO,
     status: HttpStatus.OK,
