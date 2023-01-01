@@ -6,6 +6,7 @@ import databaseConfig from './config/database.config';
 import envSchema from './env.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { getMondoDbConfig } from './config/mongodb.config';
+import { jwtOptions } from './config/jwt.config';
 
 
 @Module({
@@ -15,7 +16,7 @@ import { getMondoDbConfig } from './config/mongodb.config';
       cache: true,
       isGlobal: true,
       envFilePath: ENV_FILE_PATH,
-      load: [databaseConfig,],
+      load: [databaseConfig, jwtOptions,],
       validationSchema: envSchema,
     }),
     MongooseModule.forRootAsync(

@@ -1,9 +1,10 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { fillObject } from '@readme/core';
 import { AuthService } from './auth.service';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { LoginUserDTO } from './dto/login-user.dto';
+import { JWTAuthGuard } from './guards/jwt-auth.guard';
 import { LoggedUserRDO } from './rdo/logged-user.rdo';
 import { UserRDO } from './rdo/user.rdo';
 
@@ -37,10 +38,11 @@ export class AuthController {
   })
   async login(@Body() dto: LoginUserDTO) {
     const verifiedUser = await this.authService.verifyUser(dto);
-    return fillObject(LoggedUserRDO, verifiedUser);
+    return this.authService.loginUser(verifiedUser);
   }
 
   @Get(':id')
+  @UseGuards(JWTAuthGuard)
   @ApiParam({
     name: 'id',
     description: 'ID пользователя',

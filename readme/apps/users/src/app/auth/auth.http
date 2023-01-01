@@ -1,3 +1,7 @@
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzk0NTU2MmZkNzQ5ZTdiNTE1OTUwZGUiLCJuYW1lIjoiSm9obiBDb25ub3IiLCJlbWFpbCI6ImpvaG5AZW1haWwuY29tIiwicG9zdHMiOjAsInN1YnNjcmliZXJzIjowLCJjcmVhdGVkQXQiOiIyMDIyLTEyLTEwVDA5OjQ2OjEwLjE1NloiLCJwYXNzd29yZCI6IiQyYiQxMCQ5NjRoRHBnYWtkNGUueHFpbEc1QXRlQkJteWlWREwwNVNuZ3J4ckkxRjJjSU1GNTd1bjhlSyIsImlhdCI6MTY3MjU3NzYzNCwiZXhwIjoxNjcyNTc3OTM0fQ.1EquGMZtLnyYYb-Omq3kFav2PiwPYm09mGXtNz3SfIw
+
+###
+
 # Create a new user
 POST http://localhost:3333/api/auth/register HTTP/1.1
 Content-Type: application/json
@@ -24,3 +28,4 @@ Content-Type: application/json
 
 # Get user
 GET http://localhost:3333/api/auth/63945562fd749e7b515950de HTTP/1.1
+Authorization: Bearer {{token}}
