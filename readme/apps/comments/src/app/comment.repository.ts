@@ -22,8 +22,13 @@ export class CommentRepository implements CRUDRepository<CommentEntity, string, 
     return this.commentModel.findById(id).exec();
   }
 
-  public async findAllByPostId(postId: number): Promise<Comment[]> {
-    return this.commentModel.find({postId}).exec();
+  public async findAllByPostId(postId: number, limit: number, skip: number): Promise<Comment[]> {
+    return this.commentModel
+      .find({postId})
+      .sort({createdAt: 'desc'})
+      .skip(skip)
+      .limit(limit)
+      .exec();
   }
 
   public async destroy(id: string): Promise<void> {

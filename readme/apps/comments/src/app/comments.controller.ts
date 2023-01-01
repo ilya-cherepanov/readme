@@ -3,6 +3,7 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { fillObject } from '@readme/core';
 import { CommentsService } from './comments.service';
 import { CreateCommentDTO } from './dto/create-comment.dto';
+import { GetCommentsQuery } from './query/get-comments.query';
 import { CommentRDO } from './rdo/comment.rdo';
 
 
@@ -17,8 +18,8 @@ export class CommentsController {
     status: HttpStatus.OK,
     description: 'Получить комментарии для поста с соответствующим ID',
   })
-  async get(@Param('postId', ParseIntPipe) postId: number, @Query('page') page = 0) {
-    const comments = await this.commentsService.get(postId, page);
+  async get(@Param('postId', ParseIntPipe) postId: number, @Query() query: GetCommentsQuery) {
+    const comments = await this.commentsService.get(postId, query);
 
     return fillObject(CommentRDO, comments);
   }
