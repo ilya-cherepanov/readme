@@ -3,13 +3,14 @@ import { JwtModuleOptions } from '@nestjs/jwt';
 
 
 export const jwtOptions = registerAs('jwt', () => ({
-  secret: process.env.JWT_SECRET,
+  accessSecret: process.env.JWT_ACCESS_SECRET,
+  refreshSecret: process.env.JWT_REFRESH_SECRET,
 }));
 
 
 export async function getJWTConfig(configService: ConfigService): Promise<JwtModuleOptions> {
   return {
-    secret: configService.get<string>('jwt.secret'),
+    secret: configService.get<string>('jwt.accessSecret'),
     signOptions: {expiresIn: '300s', algorithm: 'HS256'},
   };
 }

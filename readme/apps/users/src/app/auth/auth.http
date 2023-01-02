@@ -1,4 +1,5 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzk0NTU2MmZkNzQ5ZTdiNTE1OTUwZGUiLCJuYW1lIjoiSm9obiBDb25ub3IiLCJlbWFpbCI6ImpvaG5AZW1haWwuY29tIiwicG9zdHMiOjAsInN1YnNjcmliZXJzIjowLCJjcmVhdGVkQXQiOiIyMDIyLTEyLTEwVDA5OjQ2OjEwLjE1NloiLCJwYXNzd29yZCI6IiQyYiQxMCQ5NjRoRHBnYWtkNGUueHFpbEc1QXRlQkJteWlWREwwNVNuZ3J4ckkxRjJjSU1GNTd1bjhlSyIsImlhdCI6MTY3MjU3NzYzNCwiZXhwIjoxNjcyNTc3OTM0fQ.1EquGMZtLnyYYb-Omq3kFav2PiwPYm09mGXtNz3SfIw
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzOTQ1NTYyZmQ3NDllN2I1MTU5NTBkZSIsImVtYWlsIjoiam9obkBlbWFpbC5jb20iLCJpYXQiOjE2NzI2NzA3MTAsImV4cCI6MTY3MjY3MTAxMH0.6SJ9HcAaPCEZm_3pIhYoG4j1b0okD7wxQhLq9_X-oSY
+@refreshToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzOTQ1NTYyZmQ3NDllN2I1MTU5NTBkZSIsImVtYWlsIjoiam9obkBlbWFpbC5jb20iLCJpYXQiOjE2NzI2Njc1ODQsImV4cCI6MTY3MzI3MjM4NH0.vkKo6Ng-fhsg5n6H3SOSvZl79INF07cSvjVC_4fcipU
 
 ###
 
@@ -26,6 +27,12 @@ Content-Type: application/json
 
 ###
 
+# Refresh token
+POST http://localhost:3333/api/auth/refresh HTTP/1.1
+Authorization: Bearer {{refreshToken}}
+
+###
+
 # Get user
 GET http://localhost:3333/api/auth/63945562fd749e7b515950de HTTP/1.1
-Authorization: Bearer {{token}}
+Authorization: Bearer {{accessToken}}

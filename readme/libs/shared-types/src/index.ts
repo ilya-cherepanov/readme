@@ -4,3 +4,4 @@ export * from './lib/post.interface';
 export * from './lib/post-status.enum';
 export * from './lib/comment.interface';
 export * from './lib/post-guards';
+export * from './lib/jwt-payload.interface';

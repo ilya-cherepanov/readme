@@ -1,10 +1,12 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { fillObject } from '@readme/core';
+import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { LoginUserDTO } from './dto/login-user.dto';
 import { JWTAuthGuard } from './guards/jwt-auth.guard';
+import { JWTRefreshGuard } from './guards/jwt-refresh.guard';
 import { LoggedUserRDO } from './rdo/logged-user.rdo';
 import { UserRDO } from './rdo/user.rdo';
 
@@ -37,8 +39,7 @@ export class AuthController {
     description: 'Неверная почта или пароль',
   })
   async login(@Body() dto: LoginUserDTO) {
-    const verifiedUser = await this.authService.verifyUser(dto);
-    return this.authService.loginUser(verifiedUser);
+    return this.authService.login(dto);
   }
 
   @Get(':id')
@@ -61,5 +62,12 @@ export class AuthController {
     const existingUser = await this.authService.get(id);
 
     return fillObject(UserRDO, existingUser);
+  }
+
+  @Post('refresh')
+  @UseGuards(JWTRefreshGuard)
+  @HttpCode(HttpStatus.OK)
+  async refresh(@Req() request: Request) {
+    return this.authService.refresh(request.user['id'], request.user['refreshToken']);
   }
 }

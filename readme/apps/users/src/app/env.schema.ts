@@ -21,7 +21,10 @@ export default Joi.object({
   MONGO_AUTH_BASE: Joi
     .string()
     .required(),
-  JWT_SECRET: Joi
+  JWT_ACCESS_SECRET: Joi
+    .string()
+    .required(),
+  JWT_REFRESH_SECRET: Joi
     .string()
     .required(),
 });

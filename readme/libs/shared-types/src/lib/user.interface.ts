@@ -7,4 +7,5 @@ export interface User {
   subscribers: number;
   createdAt: Date;
   avatar?: string;
+  refreshTokenHash?: string;
 }

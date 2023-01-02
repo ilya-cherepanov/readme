@@ -40,6 +40,7 @@
     "@nrwl/node": "15.2.1",
     "@nrwl/workspace": "15.2.1",
     "@types/bcrypt": "^5.0.0",
+    "@types/express": "^4.17.15",
     "@types/jest": "28.1.1",
     "@types/node": "18.7.1",
     "@types/passport": "^1.0.11",

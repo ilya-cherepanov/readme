@@ -42,6 +42,11 @@ export class UserModel extends Document implements User {
     default: now(),
   })
   createdAt: Date;
+
+  @Prop({
+    required: false,
+  })
+  refreshTokenHash?: string
 }
 
 export const UserSchema = SchemaFactory.createForClass(UserModel);
