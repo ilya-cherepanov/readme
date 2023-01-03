@@ -6,27 +6,28 @@ import { Expose, Transform } from "class-transformer";
 export class PostRDO {
   @ApiProperty({
     description: 'Уникальный ID поста',
-    example: '3ee6104d-1c23-4be6-827a-f0bd350b423c',
+    example: 10,
   })
   @Expose()
   id: number;
 
   @ApiProperty({
     description: 'ID пользователя создавшего пост',
-    example: '3ee6104d-1c23-4be6-827a-f0bd350b423c',
+    example: '63945562fd749e7b515950de',
   })
   @Expose()
   creatorId: string;
 
   @ApiProperty({
     description: 'ID владельца или репостера поста',
-    example: '3ee6104d-1c23-4be6-827a-f0bd350b423c',
+    example: '63945562fd749e7b515950de',
   })
   @Expose()
   authorId: string;
 
   @ApiProperty({
     description: 'Тип поста',
+    enum: PostCategory,
     example: 'text',
   })
   @Expose()
@@ -49,7 +50,8 @@ export class PostRDO {
 
   @ApiProperty({
     description: 'Статус публикации поста',
-    example: 'published'
+    enum: PostStatus,
+    example: 'published',
   })
   @Expose()
   postStatus: PostStatus;

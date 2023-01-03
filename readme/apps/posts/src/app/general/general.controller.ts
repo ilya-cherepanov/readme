@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseBoolPipe, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseBoolPipe, ParseIntPipe, Post, Query } from '@nestjs/common';
 import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { fillObject } from '@readme/core';
 import { LikePostDTO } from './dto/like-post.dto';
 import { RepostPostDTO } from './dto/repost-post.dto';
 import { GeneralService } from './general.service';
+import { GetPostsQuery } from './query/get-posts.query';
 import { PostRDO } from './rdo/post.rdo';
 
 
@@ -18,8 +19,8 @@ export class GeneralController {
     status: HttpStatus.OK,
     description: 'Получить опубликованные посты'
   })
-  async getPosts() {
-    const posts = await this.generalService.get();
+  async getPosts(@Query() query: GetPostsQuery) {
+    const posts = await this.generalService.get(query);
 
     return fillObject(PostRDO, posts);
   }
@@ -40,7 +41,7 @@ export class GeneralController {
   @ApiParam({
     name: 'id',
     description: 'ID поста',
-    example: '3ee6104d-1c23-4be6-827a-f0bd350b423c',
+    example: 10,
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -65,16 +66,5 @@ export class GeneralController {
     const likedPost = await this.generalService.setLike(dto, state);
 
     return fillObject(PostRDO, likedPost);
-  }
-
-  @Delete('like')
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Убрать лайк',
-  })
-  async deleteLike(@Body() dto: LikePostDTO) {
-    const unlikedPost = await this.generalService.setLike(dto, false);
-
-    return fillObject(PostRDO, unlikedPost);
   }
 }

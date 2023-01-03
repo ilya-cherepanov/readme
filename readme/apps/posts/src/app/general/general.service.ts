@@ -4,13 +4,20 @@ import { LinkPostEntity, PhotoPostEntity, PostEntity, QuotePostEntity, TextPostE
 import { LikePostDTO } from './dto/like-post.dto';
 import { RepostPostDTO } from './dto/repost-post.dto';
 import { PostRepository } from './post.repository';
+import { GetPostsQuery } from './query/get-posts.query';
 
 @Injectable()
 export class GeneralService {
   constructor(private readonly postRepository: PostRepository) {}
 
-  async get() {
-    return this.postRepository.findAllPublished();
+  async get(query: GetPostsQuery) {
+    const skip = query.page * query.quantity;
+
+    return this.postRepository.findAllPublished(query.quantity, skip, {
+      sortByPublish: query.sortByPublish,
+      sortByComments: query.sortByComments,
+      sortByLikes: query.sortByLikes,
+    });
   }
 
   async repost(dto: RepostPostDTO) {

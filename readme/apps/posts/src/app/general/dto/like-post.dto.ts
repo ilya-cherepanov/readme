@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsInt, IsMongoId } from 'class-validator';
 
 
 export class LikePostDTO {
@@ -6,11 +7,13 @@ export class LikePostDTO {
     description: 'ID поста',
     example: 10,
   })
+  @IsInt()
   postId: number;
 
   @ApiProperty({
     description: 'ID пользователя',
-    example: '3ee6104d-1c23-4be6-827a-f0bd350b4210',
+    example: '63945562fd749e7b515950de',
   })
+  @IsMongoId()
   userId: string;
 }

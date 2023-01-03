@@ -3,6 +3,7 @@ import { CRUDRepository } from '@readme/core';
 import { Post, PostCategory, PostStatus } from '@readme/shared-types';
 import { PrismaService } from '../prisma/prisma.service';
 import { PostEntity } from '../post.entity';
+import { SortingParams } from '../types/sorting-params.inteface';
 
 
 @Injectable()
@@ -32,16 +33,37 @@ export class PostRepository implements CRUDRepository<PostEntity, number, Post> 
     return post;
   }
 
-  async findAllPublished(): Promise<Post[]> {
-    const dbPosts = await this.prismaService.post.findMany({
-      where: {isRePost: false, postStatus: PostStatus.Published},
+  async findAllPublished(limit: number, skip: number, sorting: SortingParams): Promise<Post[]> {
+    type QueryType = Parameters<typeof this.prismaService.post.findMany>[0];
+
+    const query: QueryType = {
+      where: {postStatus: PostStatus.Published},
       include: {
         _count: {
           select: {likes: true},
         },
       },
-    });
+      orderBy: {
+        publishedAt: sorting.sortByPublish,
+      },
+      skip,
+      take: limit,
+    };
 
+    if (sorting.sortByLikes) {
+      query.orderBy = [
+        {
+          likes: {
+            _count: sorting.sortByLikes,
+          },
+        },
+        {
+          publishedAt: sorting.sortByPublish,
+        },
+      ];
+    }
+
+    const dbPosts = await this.prismaService.post.findMany(query);
     const publishedPosts: Post[] = dbPosts.map((dbPost) => ({
       ...dbPost,
       postStatus: dbPost.postStatus as PostStatus,

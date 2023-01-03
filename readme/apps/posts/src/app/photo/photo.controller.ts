@@ -27,7 +27,7 @@ export class PhotoController {
   @ApiParam({
     name: 'id',
     description: 'ID поста',
-    example: '3ee6104d-1c23-4be6-827a-f0bd350b423c',
+    example: 10,
   })
   @ApiResponse({
     status: HttpStatus.OK,
