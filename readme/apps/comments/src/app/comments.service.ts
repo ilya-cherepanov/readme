@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CommentEntity } from './comment.entity';
 import { CommentRepository } from './comment.repository';
 import { COMMENT_NOT_FOUND } from './comments.constants';
@@ -26,7 +26,7 @@ export class CommentsService {
 
   async delete(id: string) {
     if (!this.commentsRepository.findById(id)) {
-      throw new Error(COMMENT_NOT_FOUND);
+      throw new NotFoundException(COMMENT_NOT_FOUND);
     }
 
     await this.commentsRepository.destroy(id);

@@ -1,10 +1,11 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { fillObject } from '@readme/core';
 import { CommentsService } from './comments.service';
 import { CreateCommentDTO } from './dto/create-comment.dto';
 import { GetCommentsQuery } from './query/get-comments.query';
 import { CommentRDO } from './rdo/comment.rdo';
+import { MongoIdValidationPipe } from '@readme/core';
 
 
 @ApiTags('Comments')
@@ -14,7 +15,7 @@ export class CommentsController {
 
   @Get('/posts/:postId')
   @ApiResponse({
-    type: Array<CommentRDO>,
+    type: [CommentRDO],
     status: HttpStatus.OK,
     description: 'Получить комментарии для поста с соответствующим ID',
   })
@@ -37,11 +38,16 @@ export class CommentsController {
   }
 
   @Delete(':id')
+  @ApiParam({
+    name: 'id',
+    description: 'ID комментария',
+    example: '63b1b72b07247fd1feca2cbc',
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Удалить комментарий по ID'
   })
-  async delete(@Param('id') id: string) {
+  async delete(@Param('id', MongoIdValidationPipe) id: string) {
     await this.commentsService.delete(id);
   }
 }

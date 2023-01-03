@@ -32,7 +32,7 @@ export class CommentRepository implements CRUDRepository<CommentEntity, string, 
   }
 
   public async destroy(id: string): Promise<void> {
-    await this.commentModel.deleteOne({id});
+    await this.commentModel.findByIdAndDelete(id).exec()
   }
 
   public async update(id: string, item: CommentEntity): Promise<Comment> {

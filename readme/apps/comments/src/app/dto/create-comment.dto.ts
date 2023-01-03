@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsString, Length, Min } from 'class-validator';
+import { IsInt, IsMongoId, IsString, Length, Min } from 'class-validator';
 import { Text } from '../comments.constants';
 
 
@@ -14,9 +14,9 @@ export class CreateCommentDTO {
 
   @ApiProperty({
     description: 'Идентификатор автора',
-    example: 'e203b269-4b66-4e3f-acd3-7ce25e9828f5'
+    example: '63b1b72b07247fd1feca2cbc'
   })
-  @IsString()
+  @IsMongoId()
   public authorId: string;
 
   @ApiProperty({

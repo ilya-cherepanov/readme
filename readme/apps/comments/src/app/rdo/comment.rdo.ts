@@ -5,7 +5,7 @@ import { Expose, Transform } from "class-transformer";
 export class CommentRDO {
   @ApiProperty({
     description: 'Идентификатор комментария',
-    example: 'e203b269-4b66-4e3f-acd3-7ce25e9828f5'
+    example: '63b1b72b07247fd1feca2cbc'
   })
   @Expose({name: '_id'})
   @Transform(({obj}) => obj._id.toString())
@@ -20,7 +20,7 @@ export class CommentRDO {
 
   @ApiProperty({
     description: 'Идентификатор автора',
-    example: 'e203b269-4b66-4e3f-acd3-7ce25e9828f5'
+    example: '63b1b72b07247fd1feca2cbc'
   })
   @Expose()
   authorId: string;
