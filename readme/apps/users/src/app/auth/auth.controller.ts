@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { fillObject } from '@readme/core';
+import { fillObject, MongoIdValidationPipe } from '@readme/core';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { CreateUserDTO } from './dto/create-user.dto';
@@ -47,7 +47,7 @@ export class AuthController {
   @ApiParam({
     name: 'id',
     description: 'ID пользователя',
-    example: '3ee6104d-1c23-4be6-827a-f0bd350b423c',
+    example: '63b1b72b07247fd1feca2cbc',
   })
   @ApiResponse({
     type: UserRDO,
@@ -58,7 +58,7 @@ export class AuthController {
     status: HttpStatus.NOT_FOUND,
     description: 'Пользователь не найден',
   })
-  async get(@Param('id') id: string) {
+  async get(@Param('id', MongoIdValidationPipe) id: string) {
     const existingUser = await this.authService.get(id);
 
     return fillObject(UserRDO, existingUser);

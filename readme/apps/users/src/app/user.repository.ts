@@ -27,7 +27,7 @@ export class UserRepository implements CRUDRepository<UserEntity, string, User> 
   }
 
   public async destroy(id: string): Promise<void> {
-    await this.userModel.deleteOne({id});
+    await this.userModel.findByIdAndDelete(id).exec();
   }
 
   public async update(id: string, item: UserEntity): Promise<User> {
