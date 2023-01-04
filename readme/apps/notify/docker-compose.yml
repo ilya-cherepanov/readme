@@ -1,0 +1,54 @@
+version: '3.5'
+
+services:
+  fakesmtp:
+      image: gessnerfl/fake-smtp-server
+      container_name: readme-notify-fakesmtp
+      hostname: "fakesmtp"
+      ports:
+        - 5025:5025
+        - 1083:5080
+
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: readme-notify-rabbitmq
+    ports:
+      - 1084:15672
+      - 5672:5672
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: password1234
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongodb:
+    image: mongo
+    container_name: readme-notify-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password1234
+      MONGO_INITDB_DATABASE: readme-notify
+    ports:
+      - 27019:27017
+    volumes:
+      - ${NOTIFY_DB_DIR:-../../../db/notify}:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/readme-notify --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  mongodb-express:
+    image: mongo-express
+    container_name: readme-mongo-express
+    ports:
+      - 8083:8081
+    depends_on:
+      - mongodb
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password1234
+      ME_CONFIG_MONGODB_URL: mongodb://admin:password1234@mongodb:27017/
