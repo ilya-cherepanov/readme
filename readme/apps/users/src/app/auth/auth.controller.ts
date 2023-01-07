@@ -23,8 +23,8 @@ export class AuthController {
     description: 'Пользователь успешно зарегистрирован',
   })
   async create(@Body() dto: CreateUserDTO) {
-    const newUser = await this.authService.register(dto);
-    return fillObject(LoggedUserRDO, newUser);
+    const token = await this.authService.register(dto);
+    return token;
   }
 
   @Post('login')

@@ -27,4 +27,16 @@ export default Joi.object({
   JWT_REFRESH_SECRET: Joi
     .string()
     .required(),
+  RABBIT_USER: Joi
+    .string()
+    .required(),
+  RABBIT_PASSWORD: Joi
+    .string()
+    .required(),
+  RABBIT_HOST: Joi
+    .string()
+    .required(),
+  RABBIT_NOTIFY_SERVICE_QUEUE: Joi
+    .string()
+    .required(),
 });

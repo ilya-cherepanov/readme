@@ -1,10 +1,11 @@
-import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { JWTPayload } from '@readme/shared-types';
+import { ClientProxy } from '@nestjs/microservices';
+import { CommandEvent, JWTPayload } from '@readme/shared-types';
 import { UserEntity } from '../user.entity';
 import { UserRepository } from '../user.repository';
-import { AUTH_USER_EXISTS, AUTH_USER_NOT_FOUND, AUTH_USER_PASSWORD_WRONG } from './auth.constants';
+import { AUTH_USER_EXISTS, AUTH_USER_NOT_FOUND, AUTH_USER_PASSWORD_WRONG, RABBITMQ_SERVICE } from './auth.constants';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { LoginUserDTO } from './dto/login-user.dto';
 
@@ -15,6 +16,7 @@ export class AuthService {
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    @Inject(RABBITMQ_SERVICE) private readonly rabbitClient: ClientProxy,
   ) {}
 
   async register({name, email, password}: CreateUserDTO) {
@@ -38,7 +40,15 @@ export class AuthService {
     });
 
     await newUserEntity.setRefreshToken(tokens.refreshToken);
-    await this.userRepository.create(newUserEntity);
+    const newUser = await this.userRepository.create(newUserEntity);
+
+    this.rabbitClient.emit(
+      {cmd: CommandEvent.CreateUser},
+      {
+        email: newUser.email,
+        userId: newUser._id,
+      },
+    );
 
     return tokens;
   }
