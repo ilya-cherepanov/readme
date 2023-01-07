@@ -10,6 +10,7 @@ export const mailOptions = registerAs('mail', () => ({
   user: process.env.MAIL_SMTP_USER,
   password: process.env.MAIL_SMTP_USER_PASSWORD,
   from: process.env.MAIL_FROM,
+  postUrlPrefix: process.env.POST_URL_PREFIX,
 }));
 
 

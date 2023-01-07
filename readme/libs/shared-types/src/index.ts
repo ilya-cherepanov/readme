@@ -5,3 +5,4 @@ export * from './lib/post-status.enum';
 export * from './lib/comment.interface';
 export * from './lib/post-guards';
 export * from './lib/jwt-payload.interface';
+export * from './lib/command-event.enum';

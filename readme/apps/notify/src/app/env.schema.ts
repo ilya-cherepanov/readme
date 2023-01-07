@@ -50,4 +50,7 @@ export default Joi.object({
   RABBIT_NOTIFY_SERVICE_QUEUE: Joi
     .string()
     .required(),
+  POST_URL_PREFIX: Joi
+    .string()
+    .required(),
 });

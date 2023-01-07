@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
-import { getRabbitMqConfig } from './app/config/rabbitmq.config';
+import { getRabbitMqConfig } from './config/rabbitmq.config';
 
 
 async function bootstrap() {
