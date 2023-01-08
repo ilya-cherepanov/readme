@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { Post, isLinkPost, isPhotoPost, isQuotePost, isTextPost, isVideoPost } from '@readme/shared-types';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Post, isLinkPost, isPhotoPost, isQuotePost, isTextPost, isVideoPost, PostStatus } from '@readme/shared-types';
 import { LinkPostEntity, PhotoPostEntity, PostEntity, QuotePostEntity, TextPostEntity, VideoPostEntity } from '../post.entity';
 import { LikePostDTO } from './dto/like-post.dto';
 import { RepostPostDTO } from './dto/repost-post.dto';
 import { PostRepository } from './post.repository';
 import { GetPostsQuery } from './query/get-posts.query';
+
 
 @Injectable()
 export class GeneralService {
@@ -20,15 +21,24 @@ export class GeneralService {
     });
   }
 
+  async getOne(id: number) {
+    const post = await this.postRepository.findById(id);
+    if (post.postStatus !== PostStatus.Published) {
+      throw new NotFoundException('Post with given ID does not exist!');
+    }
+
+    return post;
+  }
+
   async repost(dto: RepostPostDTO) {
     const existingPost = await this.postRepository.findById(dto.postId);
 
     if (!existingPost) {
-      throw new Error('Post with given ID does not exists!');
+      throw new NotFoundException('Post with given ID does not exist!');
     }
 
     if (existingPost.creatorId === dto.userId) {
-      throw new Error('User with given ID is creator of the post!');
+      throw new BadRequestException('User with given ID is creator of the post!');
     }
 
     const originalPostId = existingPost.isRePost ? existingPost.originalPostId : existingPost.id;
@@ -54,7 +64,7 @@ export class GeneralService {
     } else if (isPhotoPost(newPost)) {
       newPostEntity = new PhotoPostEntity(newPost);
     } else {
-      throw new Error('Internal error!');
+      throw new InternalServerErrorException('Internal error!');
     }
 
     return this.postRepository.create(newPostEntity);
@@ -74,7 +84,7 @@ export class GeneralService {
     const existingPost = this.postRepository.findById(id);
 
     if (!existingPost) {
-      throw new Error('Post with given ID does not exists!');
+      throw new NotFoundException('Post with given ID does not exist!');
     }
 
     await this.postRepository.destroy(id);

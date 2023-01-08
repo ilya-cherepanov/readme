@@ -40,5 +40,7 @@ export class MailService {
         posts,
       }
     });
+
+    this.postRepository.destroyAll();
   }
 }

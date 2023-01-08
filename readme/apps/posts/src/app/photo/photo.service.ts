@@ -1,14 +1,19 @@
-import { Injectable } from '@nestjs/common';
-import { PostCategory, PostStatus, isPhotoPost } from '@readme/shared-types';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { PostCategory, PostStatus, isPhotoPost, CommandEvent } from '@readme/shared-types';
 import { PhotoPostEntity } from '../post.entity';
 import { CreatePhotoPostDTO } from './dto/create-photo-post.dto';
 import { UpdatePhotoPostDTO } from './dto/update-photo-post.dto';
 import { PostRepository } from '../general/post.repository';
+import { RABBITMQ_SERVICE } from '../posts.constants';
+import { ClientProxy } from '@nestjs/microservices';
 
 
 @Injectable()
 export class PhotoService {
-  constructor(private readonly postRepository: PostRepository) {}
+  constructor(
+    private readonly postRepository: PostRepository,
+    @Inject(RABBITMQ_SERVICE) private readonly rabbitClient: ClientProxy,
+  ) {}
 
   async create(dto: CreatePhotoPostDTO) {
     const newPhotoPostEntity = new PhotoPostEntity({
@@ -21,18 +26,28 @@ export class PhotoService {
       isRePost: false,
     });
 
-    return this.postRepository.create(newPhotoPostEntity);
+    const newPost = await this.postRepository.create(newPhotoPostEntity);
+
+    this.rabbitClient.emit(
+      {cmd: CommandEvent.CreatePost},
+      {
+        title: 'Пользователь опубликовал новую фотографию',
+        postId: newPost.id,
+      },
+    );
+
+    return newPost;
   }
 
   async update(id: number, dto: UpdatePhotoPostDTO) {
     const existingPost = await this.postRepository.findById(id);
 
     if (!existingPost) {
-      throw new Error('Post with given ID does not exists!');
+      throw new NotFoundException('Post with given ID does not exist!');
     }
 
     if (!isPhotoPost(existingPost)) {
-      throw new Error('Post with give ID is not photo post!');
+      throw new BadRequestException('Post with given ID is not photo post!');
     }
 
     const updatedPhotoPostEntity = new PhotoPostEntity({

@@ -25,6 +25,18 @@ export class GeneralController {
     return fillObject(PostRDO, posts);
   }
 
+  @Get(':id')
+  @ApiResponse({
+    type: PostRDO,
+    status: HttpStatus.OK,
+    description: 'Получить один опубликованный пост'
+  })
+  async getPost(@Param('id', ParseIntPipe) id: number) {
+    const post = await this.generalService.getOne(id);
+
+    return fillObject(PostRDO, post);
+  }
+
   @Post('repost')
   @ApiResponse({
     type: PostRDO,
