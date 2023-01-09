@@ -11,8 +11,10 @@ import { getJWTConfig } from '../config/jwt.config';
 import { JWTStrategy } from './strategies/jwt.strategy';
 import { JWTRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { ClientsModule } from '@nestjs/microservices';
-import { RABBITMQ_SERVICE } from './auth.constants';
+import { RABBITMQ_SERVICE } from '../user.constants';
 import { getRabbitMqConfig } from '../config/rabbitmq.config';
+import { MulterModule } from '@nestjs/platform-express';
+import { getUploadFilesConfig } from '../config/upload-files.config';
 
 
 @Module({
@@ -33,8 +35,14 @@ import { getRabbitMqConfig } from '../config/rabbitmq.config';
         inject: [ConfigService]
       }
     ]),
+    MulterModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: getUploadFilesConfig,
+      inject: [ConfigService],
+    }),
   ],
   providers: [AuthService, UserRepository, JWTStrategy, JWTRefreshStrategy],
   controllers: [AuthController],
+  exports: [UserRepository],
 })
 export class AuthModule {}

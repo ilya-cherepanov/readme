@@ -39,4 +39,7 @@ export default Joi.object({
   RABBIT_NOTIFY_SERVICE_QUEUE: Joi
     .string()
     .required(),
+  UPLOAD_FILES_DIR: Joi
+    .string()
+    .required(),
 });

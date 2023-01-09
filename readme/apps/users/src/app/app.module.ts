@@ -8,16 +8,19 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { getMondoDbConfig } from './config/mongodb.config';
 import { jwtOptions } from './config/jwt.config';
 import { rabbitMqOptions } from './config/rabbitmq.config';
+import { uploadFilesOptions } from './config/upload-files.config';
+import { AvatarModule } from './avatar/avatar.module';
 
 
 @Module({
   imports: [
     AuthModule,
+    AvatarModule,
     ConfigModule.forRoot({
       cache: true,
       isGlobal: true,
       envFilePath: ENV_FILE_PATH,
-      load: [databaseConfig, jwtOptions, rabbitMqOptions],
+      load: [databaseConfig, jwtOptions, rabbitMqOptions, uploadFilesOptions],
       validationSchema: envSchema,
     }),
     MongooseModule.forRootAsync(

@@ -3,11 +3,12 @@ import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { fillObject, MongoIdValidationPipe } from '@readme/core';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
+import { ChangePasswordDTO } from './dto/change-password.dto';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { LoginUserDTO } from './dto/login-user.dto';
 import { JWTAuthGuard } from './guards/jwt-auth.guard';
 import { JWTRefreshGuard } from './guards/jwt-refresh.guard';
-import { LoggedUserRDO } from './rdo/logged-user.rdo';
+import { TokensRDO } from './rdo/tokens.rdo';
 import { UserRDO } from './rdo/user.rdo';
 
 
@@ -18,19 +19,19 @@ export class AuthController {
 
   @Post('register')
   @ApiResponse({
-    type: LoggedUserRDO,
+    type: TokensRDO,
     status: HttpStatus.CREATED,
     description: 'Пользователь успешно зарегистрирован',
   })
   async create(@Body() dto: CreateUserDTO) {
-    const token = await this.authService.register(dto);
-    return token;
+    const tokens = await this.authService.register(dto);
+    return fillObject(TokensRDO, tokens);
   }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
-    type: LoggedUserRDO,
+    type: TokensRDO,
     status: HttpStatus.OK,
     description: 'Пользователь успешно авторизовался',
   })
@@ -39,7 +40,8 @@ export class AuthController {
     description: 'Неверная почта или пароль',
   })
   async login(@Body() dto: LoginUserDTO) {
-    return this.authService.login(dto);
+    const tokens = await this.authService.login(dto);
+    return fillObject(TokensRDO, tokens);
   }
 
   @Get(':id')
@@ -67,7 +69,24 @@ export class AuthController {
   @Post('refresh')
   @UseGuards(JWTRefreshGuard)
   @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    type: TokensRDO,
+    status: HttpStatus.OK,
+    description: 'Обновляет токены авторизации',
+  })
   async refresh(@Req() request: Request) {
-    return this.authService.refresh(request.user['id'], request.user['refreshToken']);
+    const tokens = await this.authService.refresh(request.user['id'], request.user['refreshToken']);
+    return fillObject(TokensRDO, tokens);
+  }
+
+  @Post('change-password')
+  @UseGuards(JWTAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Изменяет пароль',
+  })
+  async changePassword(@Req() request: Request, @Body() dto: ChangePasswordDTO) {
+    await this.authService.changePassword(request.user['id'], dto);
   }
 }

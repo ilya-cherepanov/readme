@@ -5,7 +5,8 @@ import { ClientProxy } from '@nestjs/microservices';
 import { CommandEvent, JWTPayload } from '@readme/shared-types';
 import { UserEntity } from '../user.entity';
 import { UserRepository } from '../user.repository';
-import { AUTH_USER_EXISTS, AUTH_USER_NOT_FOUND, AUTH_USER_PASSWORD_WRONG, RABBITMQ_SERVICE } from './auth.constants';
+import { AUTH_USER_EXISTS, AUTH_USER_NOT_FOUND, AUTH_USER_PASSWORD_WRONG, RABBITMQ_SERVICE } from '../user.constants';
+import { ChangePasswordDTO } from './dto/change-password.dto';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { LoginUserDTO } from './dto/login-user.dto';
 
@@ -34,19 +35,20 @@ export class AuthService {
       createdAt: new Date(),
     })).setPassword(password);
 
-    const tokens = await this.getTokens({
-      id: newUserEntity._id,
-      email: newUserEntity.email,
-    });
 
-    await newUserEntity.setRefreshToken(tokens.refreshToken);
     const newUser = await this.userRepository.create(newUserEntity);
+    const tokens = await this.getTokens({
+      id: newUser._id.toString(),
+      email: newUser.email,
+    });
+    await newUserEntity.setRefreshToken(tokens.refreshToken);
+    await this.userRepository.update(newUser._id.toString(), newUserEntity);
 
     this.rabbitClient.emit(
       {cmd: CommandEvent.CreateUser},
       {
         email: newUser.email,
-        userId: newUser._id,
+        userId: newUser._id.toString(),
       },
     );
 
@@ -54,13 +56,13 @@ export class AuthService {
   }
 
   async login({email, password}: LoginUserDTO) {
-    const existsUser = await this.userRepository.findByEmail(email);
+    const existingUser = await this.userRepository.findByEmail(email);
 
-    if (!existsUser) {
+    if (!existingUser) {
       throw new UnauthorizedException(AUTH_USER_NOT_FOUND);
     }
 
-    const userEntity = new UserEntity(existsUser);
+    const userEntity = new UserEntity(existingUser);
     if (!await userEntity.checkPassword(password)) {
       throw new UnauthorizedException(AUTH_USER_PASSWORD_WRONG);
     }
@@ -98,7 +100,7 @@ export class AuthService {
     }
 
     const tokens = await this.getTokens({
-      id: userEntity._id,
+      id: userEntity._id.toString(),
       email: userEntity.email
     });
 
@@ -106,6 +108,18 @@ export class AuthService {
     await this.userRepository.update(userId, userEntity);
 
     return tokens;
+  }
+
+  async changePassword(userId: string, dto: ChangePasswordDTO) {
+    const existingUser = await this.userRepository.findById(userId);
+
+    const userEntity = new UserEntity(existingUser);
+    if (!await userEntity.checkPassword(dto.password)) {
+      throw new UnauthorizedException(AUTH_USER_PASSWORD_WRONG);
+    }
+
+    await userEntity.setPassword(dto.newPassword);
+    await this.userRepository.update(userEntity._id, userEntity);
   }
 
   private async getTokens(payload: JWTPayload) {
