@@ -41,3 +41,5 @@ export const enum LinkPostDescription {
 export const DEFAULT_POSTS_PER_PAGE = 25;
 export const ENV_FILE_PATH = 'environments/.posts.env';
 export const RABBITMQ_SERVICE = Symbol('RABBITMQ_SERVICE');
+export const PHOTO_FILE_TYPES = /jpeg|jpg|png/;
+export const PHOTO_FILE_SIZE = 1024 * 1024;

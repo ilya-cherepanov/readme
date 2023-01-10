@@ -39,6 +39,31 @@ export class PhotoService {
     return newPost;
   }
 
+  async savePhoto(userId: string, filename: string) {
+    const newPhotoPostEntity = new PhotoPostEntity({
+      photo: filename,
+      creatorId: userId,
+      authorId: userId,
+      createdAt: new Date(),
+      postStatus: PostStatus.Published,
+      publishedAt: new Date(),
+      postCategory: PostCategory.Photo,
+      isRePost: false,
+    });
+
+    const newPost = await this.postRepository.create(newPhotoPostEntity);
+
+    this.rabbitClient.emit(
+      {cmd: CommandEvent.CreatePost},
+      {
+        title: 'Пользователь опубликовал новую фотографию',
+        postId: newPost.id,
+      },
+    );
+
+    return newPost;
+  }
+
   async update(id: number, dto: UpdatePhotoPostDTO) {
     const existingPost = await this.postRepository.findById(id);
 

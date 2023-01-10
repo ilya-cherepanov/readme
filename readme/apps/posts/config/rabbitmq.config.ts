@@ -1,4 +1,4 @@
-import { ConfigService, registerAs } from "@nestjs/config";
+import { ConfigService, registerAs } from '@nestjs/config';
 import { RmqOptions, Transport } from '@nestjs/microservices';
 
 

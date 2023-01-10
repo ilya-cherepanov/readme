@@ -9,6 +9,8 @@ import { ConfigModule } from '@nestjs/config';
 import envSchema from './env.schema';
 import { rabbitMqOptions } from '../../config/rabbitmq.config';
 import { ENV_FILE_PATH } from './posts.constants';
+import { uploadFilesOptions } from 'apps/posts/config/upload-files.config';
+import { jwtOptions } from '../../config/jwt.config';
 
 
 @Module({
@@ -23,7 +25,7 @@ import { ENV_FILE_PATH } from './posts.constants';
       cache: true,
       isGlobal: true,
       envFilePath: ENV_FILE_PATH,
-      load: [rabbitMqOptions],
+      load: [rabbitMqOptions, uploadFilesOptions, jwtOptions],
       validationSchema: envSchema,
     }),
   ],

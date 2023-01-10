@@ -10,7 +10,8 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
 
   app.useGlobalPipes(new ValidationPipe({
-    transform: true
+    transform: true,
+    whitelist: true,
   }));
 
   const swaggerConfig = new DocumentBuilder()
