@@ -26,6 +26,24 @@ export class GeneralController {
     return fillObject(PostRDO, posts);
   }
 
+  @Get(':id')
+  @ApiParam({
+    name: 'id',
+    description: 'ID поста',
+    example: 10,
+  })
+  @ApiResponse({
+    type: PostRDO,
+    status: HttpStatus.OK,
+    description: 'Получить один опубликованный пост'
+  })
+  async getPost(@Param('id', ParseIntPipe) id: number) {
+    const post = await this.generalService.getOne(id);
+    console.log(post);
+
+    return fillObject(PostRDO, post);
+  }
+
   @Get('search')
   @ApiResponse({
     type: [PostRDO],
@@ -49,23 +67,6 @@ export class GeneralController {
     const posts = await this.getDraft(request.user['id']);
 
     return fillObject(PostRDO, posts);
-  }
-
-  @Get(':id')
-  @ApiParam({
-    name: 'id',
-    description: 'ID поста',
-    example: 10,
-  })
-  @ApiResponse({
-    type: PostRDO,
-    status: HttpStatus.OK,
-    description: 'Получить один опубликованный пост'
-  })
-  async getPost(@Param('id', ParseIntPipe) id: number) {
-    const post = await this.generalService.getOne(id);
-
-    return fillObject(PostRDO, post);
   }
 
   @Post(':id/repost')

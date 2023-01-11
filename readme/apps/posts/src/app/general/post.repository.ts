@@ -16,7 +16,7 @@ export class PostRepository implements CRUDRepository<PostEntity, number, Post> 
       where: {id},
       include: {
         _count: {
-          select: {likes: true},
+          select: {likes: true, comments: true},
         },
       },
     });
@@ -41,7 +41,7 @@ export class PostRepository implements CRUDRepository<PostEntity, number, Post> 
       where: {postStatus: PostStatus.Published, postCategory: postCategory},
       include: {
         _count: {
-          select: {likes: true},
+          select: {likes: true, comments: true},
         },
       },
       orderBy: {
@@ -85,7 +85,7 @@ export class PostRepository implements CRUDRepository<PostEntity, number, Post> 
       take: limit,
       include: {
         _count: {
-          select: {likes: true},
+          select: {likes: true, comments: true},
         },
       },
     });
@@ -101,7 +101,7 @@ export class PostRepository implements CRUDRepository<PostEntity, number, Post> 
       },
       include: {
         _count: {
-          select: {likes: true},
+          select: {likes: true, comments: true},
         },
       },
     });
@@ -124,7 +124,7 @@ export class PostRepository implements CRUDRepository<PostEntity, number, Post> 
     const dbPost = await this.prismaService.post.create({
       data: item.toObject(),
       include: {
-        _count: {select: {likes: true}},
+        _count: {select: {likes: true, comments: true}},
       },
     });
 
@@ -140,7 +140,7 @@ export class PostRepository implements CRUDRepository<PostEntity, number, Post> 
       where: {id},
       data: {...item.toObject()},
       include: {
-        _count: {select: {likes: true}},
+        _count: {select: {likes: true, comments: true}},
       },
     });
 

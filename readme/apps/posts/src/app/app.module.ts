@@ -11,6 +11,7 @@ import { rabbitMqOptions } from '../../config/rabbitmq.config';
 import { ENV_FILE_PATH } from './posts.constants';
 import { uploadFilesOptions } from 'apps/posts/config/upload-files.config';
 import { jwtOptions } from '../../config/jwt.config';
+import { CommentsModule } from './comments/comments.module';
 
 
 @Module({
@@ -21,6 +22,7 @@ import { jwtOptions } from '../../config/jwt.config';
     VideoModule,
     QuoteModule,
     LinkModule,
+    CommentsModule,
     ConfigModule.forRoot({
       cache: true,
       isGlobal: true,

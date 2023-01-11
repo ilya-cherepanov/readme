@@ -3,7 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output = "../../../node_modules/.prisma/client"
+  output   = "../../../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -33,6 +33,7 @@ model Post {
   link           String?
   description    String?
   likes          Like[]
+  comments       Comment[]
 }
 
 model Like {
@@ -40,6 +41,15 @@ model Like {
   userId String
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
 
-  @@unique([postId, userId], name: "Key")
   @@id([postId, userId])
+  @@unique([postId, userId], name: "Key")
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  authorId  String
+  postId    Int
+  text      String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }

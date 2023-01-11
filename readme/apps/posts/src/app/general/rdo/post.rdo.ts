@@ -157,7 +157,16 @@ export class PostRDO {
     example: 10,
     required: true,
   })
-  @Expose({name: '_count'})
-  @Transform(({value}) => value.likes)
+  @Expose()
+  @Transform((value) => value.obj._count.likes)
   likes: number
+
+  @ApiProperty({
+    description: 'Количество комментариев',
+    example: 3,
+    required: true,
+  })
+  @Expose()
+  @Transform((value) => value.obj._count.comments)
+  comments: number
 }
