@@ -23,6 +23,10 @@ export class AuthController {
     status: HttpStatus.CREATED,
     description: 'Пользователь успешно зарегистрирован',
   })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Такой пользователь с таким email уже существует',
+  })
   async create(@Body() dto: CreateUserDTO) {
     const tokens = await this.authService.register(dto);
     return fillObject(TokensRDO, tokens);
@@ -45,7 +49,6 @@ export class AuthController {
   }
 
   @Get(':id')
-  @UseGuards(JWTAuthGuard)
   @ApiParam({
     name: 'id',
     description: 'ID пользователя',
@@ -57,7 +60,7 @@ export class AuthController {
     description: 'Пользователь получен',
   })
   @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
+    status: HttpStatus.BAD_REQUEST,
     description: 'Пользователь не найден',
   })
   async get(@Param('id', MongoIdValidationPipe) id: string) {
@@ -74,6 +77,10 @@ export class AuthController {
     status: HttpStatus.OK,
     description: 'Обновляет токены авторизации',
   })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Неверный refresh токен'
+  })
   async refresh(@Req() request: Request) {
     const tokens = await this.authService.refresh(request.user['id'], request.user['refreshToken']);
     return fillObject(TokensRDO, tokens);
@@ -84,7 +91,15 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Изменяет пароль',
+    description: 'Пароль изменен',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Неверный или истекший access токен'
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Неверный пароль',
   })
   async changePassword(@Req() request: Request, @Body() dto: ChangePasswordDTO) {
     await this.authService.changePassword(request.user['id'], dto);

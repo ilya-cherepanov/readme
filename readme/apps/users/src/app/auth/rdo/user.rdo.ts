@@ -20,7 +20,8 @@ export class UserRDO {
 
   @ApiProperty({
     description: 'Количество постов',
-    example: 12
+    example: 12,
+    required: false,
   })
   @Expose()
   public posts: number;

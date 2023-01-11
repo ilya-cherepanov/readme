@@ -120,6 +120,15 @@ export class PostRepository implements CRUDRepository<PostEntity, number, Post> 
     return count > 0;
   }
 
+  async countByUserId(userId: string): Promise<number> {
+    return this.prismaService.post.count({
+      where: {
+        postStatus: PostStatus.Published,
+        authorId: userId,
+      },
+    });
+  }
+
   async create(item: PostEntity): Promise<Post> {
     const dbPost = await this.prismaService.post.create({
       data: item.toObject(),

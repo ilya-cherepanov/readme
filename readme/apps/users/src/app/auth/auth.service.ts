@@ -5,10 +5,12 @@ import { ClientProxy } from '@nestjs/microservices';
 import { CommandEvent, JWTPayload } from '@readme/shared-types';
 import { UserEntity } from '../user.entity';
 import { UserRepository } from '../user.repository';
-import { AUTH_USER_EXISTS, AUTH_USER_NOT_FOUND, AUTH_USER_PASSWORD_WRONG, RABBITMQ_SERVICE } from '../user.constants';
+import { AUTH_USER_EXISTS, AUTH_USER_NOT_FOUND, AUTH_USER_PASSWORD_WRONG, JWT_REFRESH_TOKEN_EXPIRES_IN, RABBITMQ_SERVICE, REFRESH_TOKEN_NOT_MATCH } from '../user.constants';
 import { ChangePasswordDTO } from './dto/change-password.dto';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { LoginUserDTO } from './dto/login-user.dto';
+import axios from 'axios';
+import { PostCountResponse } from '../../types/post-count-response.interface';
 
 
 @Injectable()
@@ -84,19 +86,27 @@ export class AuthService {
       throw new BadRequestException(AUTH_USER_NOT_FOUND);
     }
 
-    return existingUser;
+    const postCount = await this.loadPostsCount(existingUser._id);
+    if (!postCount) {
+      return existingUser;
+    }
+
+    return {
+      ...existingUser,
+      posts: postCount.count,
+    };
   }
 
   async refresh(userId: string, refreshToken: string) {
     const user = await this.userRepository.findById(userId);
     if (!user) {
-      throw new ForbiddenException('Access denied!');
+      throw new ForbiddenException(AUTH_USER_NOT_FOUND);
     }
 
     const userEntity = new UserEntity(user);
 
     if (!await userEntity.checkRefreshToken(refreshToken)) {
-      throw new ForbiddenException('Access denied!');
+      throw new ForbiddenException(REFRESH_TOKEN_NOT_MATCH);
     }
 
     const tokens = await this.getTokens({
@@ -115,7 +125,7 @@ export class AuthService {
 
     const userEntity = new UserEntity(existingUser);
     if (!await userEntity.checkPassword(dto.password)) {
-      throw new UnauthorizedException(AUTH_USER_PASSWORD_WRONG);
+      throw new ForbiddenException(AUTH_USER_PASSWORD_WRONG);
     }
 
     await userEntity.setPassword(dto.newPassword);
@@ -127,7 +137,7 @@ export class AuthService {
       this.jwtService.signAsync(payload),
       this.jwtService.signAsync(payload, {
         secret: this.configService.get<string>('jwt.refreshSecret'),
-        expiresIn: '7d',
+        expiresIn: JWT_REFRESH_TOKEN_EXPIRES_IN,
       }),
     ]);
 
@@ -135,5 +145,15 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
+  }
+
+  private async loadPostsCount(userId: string): Promise<PostCountResponse | null> {
+    try {
+      const urlPrefix = this.configService.get<string>('post.urlPrefix');
+      const response = await axios.get<PostCountResponse>(`${urlPrefix}count/${userId}`);
+      return response.data;
+    } catch {
+      return null;
+    }
   }
 }

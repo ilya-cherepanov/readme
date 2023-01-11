@@ -10,6 +10,7 @@ import { jwtOptions } from './config/jwt.config';
 import { rabbitMqOptions } from './config/rabbitmq.config';
 import { uploadFilesOptions } from './config/upload-files.config';
 import { AvatarModule } from './avatar/avatar.module';
+import { postServiceOptions } from './config/post-service.config';
 
 
 @Module({
@@ -20,7 +21,13 @@ import { AvatarModule } from './avatar/avatar.module';
       cache: true,
       isGlobal: true,
       envFilePath: ENV_FILE_PATH,
-      load: [databaseConfig, jwtOptions, rabbitMqOptions, uploadFilesOptions],
+      load: [
+        databaseConfig,
+        jwtOptions,
+        rabbitMqOptions,
+        uploadFilesOptions,
+        postServiceOptions,
+      ],
       validationSchema: envSchema,
     }),
     MongooseModule.forRootAsync(

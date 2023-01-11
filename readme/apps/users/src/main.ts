@@ -9,7 +9,9 @@ async function bootstrap() {
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+  }));
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle("The 'Users' service")

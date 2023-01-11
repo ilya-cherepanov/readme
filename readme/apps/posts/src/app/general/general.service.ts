@@ -106,4 +106,12 @@ export class GeneralService {
 
     await this.postRepository.destroy(id);
   }
+
+  async getPostCountByUserId(userId: string) {
+    const count = await this.postRepository.countByUserId(userId);
+
+    return {
+      count,
+    };
+  }
 }

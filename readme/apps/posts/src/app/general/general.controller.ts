@@ -1,11 +1,12 @@
 import { Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseBoolPipe, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { fillObject } from '@readme/core';
+import { fillObject, MongoIdValidationPipe } from '@readme/core';
 import { Request } from 'express';
 import { GeneralService } from './general.service';
 import { JWTAuthGuard } from './guards/jwt-auth.guard';
 import { GetPostsQuery } from './query/get-posts.query';
 import { SearchPostQuery } from './query/search-post.query';
+import { PostCountRDO } from './rdo/post-count-rdo';
 import { PostRDO } from './rdo/post.rdo';
 
 
@@ -67,6 +68,16 @@ export class GeneralController {
     const posts = await this.getDraft(request.user['id']);
 
     return fillObject(PostRDO, posts);
+  }
+
+  @Get('count/:userId')
+  @ApiResponse({
+    type: PostCountRDO,
+    status: HttpStatus.OK,
+    description: 'Возвращает количество публикаций пользователя с конкретным ID',
+  })
+  async getPostCountByUserId(@Param('userId', MongoIdValidationPipe) userId: string) {
+    return fillObject(PostCountRDO, await this.generalService.getPostCountByUserId(userId));
   }
 
   @Post(':id/repost')

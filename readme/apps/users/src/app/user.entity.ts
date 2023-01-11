@@ -1,6 +1,6 @@
 import { genSalt, hash, compare } from 'bcrypt';
 import { User } from '@readme/shared-types';
-import { SALT_ROUNDS } from './user.constants';
+import { REFRESH_TOKEN_NOT_DEFINED, SALT_ROUNDS } from './user.constants';
 import { ForbiddenException } from '@nestjs/common';
 
 
@@ -9,7 +9,7 @@ export class UserEntity implements User {
   email: string;
   password: string;
   name: string;
-  posts: number;
+  posts?: number;
   subscribers: number;
   createdAt: Date;
   avatar?: string;
@@ -40,7 +40,7 @@ export class UserEntity implements User {
 
   public async checkRefreshToken(refreshToken: string): Promise<boolean> {
     if (!this.refreshTokenHash) {
-      throw new ForbiddenException('Refresh token is not defined!');
+      throw new ForbiddenException(REFRESH_TOKEN_NOT_DEFINED);
     }
 
     return compare(refreshToken, this.refreshTokenHash);
@@ -50,11 +50,13 @@ export class UserEntity implements User {
     this._id = user._id;
     this.name = user.name;
     this.email = user.email;
-    this.posts = user.posts;
     this.subscribers = user.subscribers;
     this.createdAt = user.createdAt;
     this.password = user.password;
 
+    if (user.posts) {
+      this.posts = user.posts;
+    }
     if (user.avatar) {
       this.avatar = user.avatar;
     }

@@ -19,7 +19,12 @@ export class UserRepository implements CRUDRepository<UserEntity, string, User> 
   }
 
   public async findById(id: string): Promise<User | null> {
-    return this.userModel.findById(id).exec();
+    const post = await this.userModel.findById(id).exec();
+    if (!post) {
+      return null;
+    }
+
+    return post.toObject();
   }
 
   public async findByEmail(email: string): Promise<User | null> {

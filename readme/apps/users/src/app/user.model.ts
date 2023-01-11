@@ -31,11 +31,6 @@ export class UserModel extends Document implements User {
   @Prop({
     required: true,
   })
-  posts: number;
-
-  @Prop({
-    required: true,
-  })
   subscribers: number;
 
   @Prop({
