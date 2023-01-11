@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { PostCategory } from "@readme/shared-types";
 import { Transform } from "class-transformer";
 import { IsEnum, IsInt, IsOptional, Min } from "class-validator";
 import { DEFAULT_POSTS_PER_PAGE } from "../../posts.constants";
@@ -16,7 +17,7 @@ export class GetPostsQuery {
   @Min(1)
   @IsInt()
   @IsOptional()
-  quantity?: number = DEFAULT_POSTS_PER_PAGE;
+  public quantity?: number = DEFAULT_POSTS_PER_PAGE;
 
   @ApiProperty({
     description: 'Страница загрузки постов',
@@ -28,7 +29,7 @@ export class GetPostsQuery {
   @Min(0)
   @IsInt()
   @IsOptional()
-  page?: number = 0;
+  public page?: number = 0;
 
   @ApiProperty({
     description: 'Отсортировать по дате публикации',
@@ -41,7 +42,7 @@ export class GetPostsQuery {
     message: 'sortByPublish must be "asc" or "desc"',
   })
   @IsOptional()
-  sortByPublish?: SortOrder = SortOrder.Descending;
+  public sortByPublish?: SortOrder = SortOrder.Descending;
 
   @ApiProperty({
     description: 'Отсортировать по количеству лайков',
@@ -53,7 +54,7 @@ export class GetPostsQuery {
     message: 'sortByLikes must be "asc" or "desc"',
   })
   @IsOptional()
-  sortByLikes?: SortOrder;
+  public sortByLikes?: SortOrder;
 
   @ApiProperty({
     description: 'Отсортировать по количеству комментариев',
@@ -65,5 +66,15 @@ export class GetPostsQuery {
     message: 'sortByComments must be "asc" or "desc"',
   })
   @IsOptional()
-  sortByComments?: SortOrder;
+  public sortByComments?: SortOrder;
+
+  @ApiProperty({
+    description: 'Указать категорию публикации(текст, видео, фото, цитата, ссылка)',
+    enum: PostCategory,
+    example: PostCategory.Text,
+    required: false,
+  })
+  @IsEnum(PostCategory)
+  @IsOptional()
+  public postCategory?: PostCategory;
 }

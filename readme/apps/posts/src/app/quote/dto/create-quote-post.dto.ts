@@ -1,16 +1,9 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { ArrayMaxSize, IsArray, IsMongoId, IsOptional, IsString, Length } from "class-validator";
+import { ArrayMaxSize, IsArray, IsOptional, IsString, Length } from "class-validator";
 import { QuotePostAuthor, QuotePostText, Tag } from "../../posts.constants";
 
 
 export class CreateQuotePostDTO {
-  @ApiProperty({
-    description: 'ID пользователя создающего публикацию',
-    example: '63945562fd749e7b515950de',
-  })
-  @IsMongoId()
-  creatorId: string;
-
   @ApiProperty({
     description: 'Тэги',
     example: ['IT', 'frontend', 'backend'],

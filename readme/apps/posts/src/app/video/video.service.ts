@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { PostCategory, PostStatus, isVideoPost, CommandEvent } from '@readme/shared-types';
 import { VideoPostEntity } from '../post.entity';
 import { CreateVideoPostDTO } from './dto/create-video-post.dto';
@@ -15,10 +15,11 @@ export class VideoService {
     @Inject(RABBITMQ_SERVICE) private readonly rabbitClient: ClientProxy,
   ) {}
 
-  async create(dto: CreateVideoPostDTO) {
+  async create(userId: string, dto: CreateVideoPostDTO) {
     const newVideoPostEntity = new VideoPostEntity({
       ...dto,
-      authorId: dto.creatorId,
+      creatorId: userId,
+      authorId: userId,
       createdAt: new Date(),
       postStatus: PostStatus.Published,
       publishedAt: new Date(),
@@ -39,13 +40,15 @@ export class VideoService {
     return newPost;
   }
 
-  async update(id: number, dto: UpdateVideoPostDTO) {
+  async update(id: number, userId: string, dto: UpdateVideoPostDTO) {
     const existingPost = await this.postRepository.findById(id);
 
     if (!existingPost) {
       throw new NotFoundException('Post with given ID does not exist!');
     }
-
+    if (existingPost.creatorId !== userId) {
+      throw new ForbiddenException('User is not a creator of the post');
+    }
     if (!isVideoPost(existingPost)) {
       throw new BadRequestException('Post with given ID is not video post!');
     }

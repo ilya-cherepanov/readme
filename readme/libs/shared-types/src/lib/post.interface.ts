@@ -14,7 +14,8 @@ export interface BasePost {
   originalPostId?: number;
   tags?: string[];
   _count?: {
-    likes: number;
+    likes?: number;
+    comments?: number;
   };
 }
 

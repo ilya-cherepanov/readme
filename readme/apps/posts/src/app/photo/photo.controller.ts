@@ -16,17 +16,6 @@ import { PhotoUploadDTO } from './dto/photo-upload.dto';
 export class PhotoController {
   constructor(private readonly photoService: PhotoService) {}
 
-  // @Post()
-  // @ApiResponse({
-  //   status: HttpStatus.CREATED,
-  //   description: 'Создана публикация-фотография',
-  // })
-  // async create(@Body() dto: CreatePhotoPostDTO) {
-  //   const newPhotoPost = await this.photoService.create(dto);
-
-  //   return fillObject(PostRDO, newPhotoPost);
-  // }
-
   @Post()
   @UseGuards(JWTAuthGuard)
   @UseInterceptors(FileInterceptor('photo'))
@@ -65,8 +54,8 @@ export class PhotoController {
     status: HttpStatus.NOT_FOUND,
     description: 'Публикация не найдена!'
   })
-  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePhotoPostDTO) {
-    const updatedPhotoPost = await this.photoService.update(id, dto);
+  async update(@Param('id', ParseIntPipe) id: number, @Req() request: Request, @Body() dto: UpdatePhotoPostDTO) {
+    const updatedPhotoPost = await this.photoService.update(id, request.user['id'], dto);
     console.log(dto);
 
     return fillObject(PostRDO, updatedPhotoPost);

@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { PostCategory, PostStatus, isPhotoPost, CommandEvent } from '@readme/shared-types';
 import { PhotoPostEntity } from '../post.entity';
 import { CreatePhotoPostDTO } from './dto/create-photo-post.dto';
@@ -64,13 +64,15 @@ export class PhotoService {
     return newPost;
   }
 
-  async update(id: number, dto: UpdatePhotoPostDTO) {
+  async update(id: number, userId: string, dto: UpdatePhotoPostDTO) {
     const existingPost = await this.postRepository.findById(id);
 
     if (!existingPost) {
       throw new NotFoundException('Post with given ID does not exist!');
     }
-
+    if (existingPost.creatorId !== userId) {
+      throw new ForbiddenException('User is not a creator of the post');
+    }
     if (!isPhotoPost(existingPost)) {
       throw new BadRequestException('Post with given ID is not photo post!');
     }

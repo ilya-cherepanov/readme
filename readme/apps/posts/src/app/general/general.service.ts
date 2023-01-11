@@ -1,10 +1,12 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Post, isLinkPost, isPhotoPost, isQuotePost, isTextPost, isVideoPost, PostStatus } from '@readme/shared-types';
 import { LinkPostEntity, PhotoPostEntity, PostEntity, QuotePostEntity, TextPostEntity, VideoPostEntity } from '../post.entity';
+import { MAX_SEARCHED_POSTS } from '../posts.constants';
 import { LikePostDTO } from './dto/like-post.dto';
 import { RepostPostDTO } from './dto/repost-post.dto';
 import { PostRepository } from './post.repository';
 import { GetPostsQuery } from './query/get-posts.query';
+import { SearchPostQuery } from './query/search-post.query';
 
 
 @Injectable()
@@ -14,7 +16,7 @@ export class GeneralService {
   async get(query: GetPostsQuery) {
     const skip = query.page * query.quantity;
 
-    return this.postRepository.findAllPublished(query.quantity, skip, {
+    return this.postRepository.findAllPublished(query.quantity, skip, query.postCategory, {
       sortByPublish: query.sortByPublish,
       sortByComments: query.sortByComments,
       sortByLikes: query.sortByLikes,
@@ -30,25 +32,36 @@ export class GeneralService {
     return post;
   }
 
-  async repost(dto: RepostPostDTO) {
-    const existingPost = await this.postRepository.findById(dto.postId);
+  async search(query: SearchPostQuery) {
+    return this.postRepository.findByTitle(query.title, MAX_SEARCHED_POSTS);
+  }
 
+  async getDraft(userId: string) {
+    return this.postRepository.findDraftByUserId(userId);
+  }
+
+  async repost(postId: number, userId: string) {
+    const existingPost = await this.postRepository.findById(postId);
     if (!existingPost) {
       throw new NotFoundException('Post with given ID does not exist!');
     }
 
-    if (existingPost.creatorId === dto.userId) {
+    if (existingPost.creatorId === userId) {
       throw new BadRequestException('User with given ID is creator of the post!');
     }
 
     const originalPostId = existingPost.isRePost ? existingPost.originalPostId : existingPost.id;
+
+    if (await this.postRepository.isReposted(originalPostId, userId)) {
+      throw new BadRequestException('The post has been already reposted!');
+    }
 
     const newPost: Post = {
       ...existingPost,
       id: undefined,
       isRePost: true,
       originalPostId,
-      authorId: dto.userId,
+      authorId: userId,
     };
 
     let newPostEntity: PostEntity;
@@ -64,27 +77,31 @@ export class GeneralService {
     } else if (isPhotoPost(newPost)) {
       newPostEntity = new PhotoPostEntity(newPost);
     } else {
-      throw new InternalServerErrorException('Internal error!');
+      throw new InternalServerErrorException('Unable to determine the type of post!');
     }
 
     return this.postRepository.create(newPostEntity);
   }
 
-  async setLike(dto: LikePostDTO, state: boolean) {
+  async setLike(postId: number, userId: string, state: boolean) {
     if (state) {
-      await this.postRepository.createLike(dto.postId, dto.userId);
+      await this.postRepository.createLike(postId, userId);
     } else {
-      await this.postRepository.deleteLike(dto.postId, dto.userId);
+      await this.postRepository.deleteLike(postId, userId);
     }
 
-    return this.postRepository.findById(dto.postId);
+    return this.postRepository.findById(postId);
   }
 
-  async delete(id: number) {
-    const existingPost = this.postRepository.findById(id);
+  async delete(id: number, userId: string) {
+    const existingPost = await this.postRepository.findById(id);
 
     if (!existingPost) {
       throw new NotFoundException('Post with given ID does not exist!');
+    }
+
+    if (existingPost.authorId !== userId) {
+      throw new ForbiddenException('User is not an author of the post!');
     }
 
     await this.postRepository.destroy(id);

@@ -4,6 +4,7 @@ import { Post, PostCategory, PostStatus } from '@readme/shared-types';
 import { PrismaService } from '../prisma/prisma.service';
 import { PostEntity } from '../post.entity';
 import { SortingParams } from '../types/sorting-params.inteface';
+import { MAX_SEARCHED_POSTS } from '../posts.constants';
 
 
 @Injectable()
@@ -33,11 +34,11 @@ export class PostRepository implements CRUDRepository<PostEntity, number, Post> 
     return post;
   }
 
-  async findAllPublished(limit: number, skip: number, sorting: SortingParams): Promise<Post[]> {
+  async findAllPublished(limit: number, skip: number, postCategory: PostCategory, sorting: SortingParams): Promise<Post[]> {
     type QueryType = Parameters<typeof this.prismaService.post.findMany>[0];
 
     const query: QueryType = {
-      where: {postStatus: PostStatus.Published},
+      where: {postStatus: PostStatus.Published, postCategory: postCategory},
       include: {
         _count: {
           select: {likes: true},
@@ -71,6 +72,52 @@ export class PostRepository implements CRUDRepository<PostEntity, number, Post> 
     }));
 
     return publishedPosts;
+  }
+
+  async findByTitle(title: string, limit = MAX_SEARCHED_POSTS): Promise<Post[]> {
+    const posts = await this.prismaService.post.findMany({
+      where: {
+        postStatus: PostStatus.Published,
+        title: {
+          contains: title,
+        },
+      },
+      take: limit,
+      include: {
+        _count: {
+          select: {likes: true},
+        },
+      },
+    });
+
+    return posts as Post[];
+  }
+
+  async findDraftByUserId(userId: string): Promise<Post[]> {
+    const posts = await this.prismaService.post.findMany({
+      where: {
+        postStatus: PostStatus.Draft,
+        authorId: userId,
+      },
+      include: {
+        _count: {
+          select: {likes: true},
+        },
+      },
+    });
+
+    return posts as Post[]
+  }
+
+  async isReposted(postId: number, userId: string): Promise<boolean> {
+    const count = await this.prismaService.post.count({
+      where: {
+        originalPostId: postId,
+        authorId: userId,
+      },
+    });
+
+    return count > 0;
   }
 
   async create(item: PostEntity): Promise<Post> {

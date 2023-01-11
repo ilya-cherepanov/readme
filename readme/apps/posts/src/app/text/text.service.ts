@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { PostCategory, PostStatus, isTextPost, CommandEvent } from '@readme/shared-types';
 import { TextPostEntity } from '../post.entity';
 import { CreateTextPostDTO } from './dto/create-text-post.dto';
@@ -15,10 +15,11 @@ export class TextService {
     @Inject(RABBITMQ_SERVICE) private readonly rabbitClient: ClientProxy,
   ) {}
 
-  async create(dto: CreateTextPostDTO) {
+  async create(userId: string, dto: CreateTextPostDTO) {
     const newTextPostEntity = new TextPostEntity({
       ...dto,
-      authorId: dto.creatorId,
+      creatorId: userId,
+      authorId: userId,
       createdAt: new Date(),
       postStatus: PostStatus.Published,
       publishedAt: new Date(),
@@ -39,13 +40,15 @@ export class TextService {
     return newPost;
   }
 
-  async update(id: number, dto: UpdateTextPostDTO) {
+  async update(id: number, userId: string, dto: UpdateTextPostDTO) {
     const existingPost = await this.postRepository.findById(id);
 
     if (!existingPost) {
       throw new NotFoundException('Post with given ID does not exist!');
     }
-
+    if (existingPost.creatorId !== userId) {
+      throw new ForbiddenException('User is not a creator of the post');
+    }
     if (!isTextPost(existingPost)) {
       throw new BadRequestException('Post with given ID is not text post!');
     }

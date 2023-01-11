@@ -43,3 +43,4 @@ export const ENV_FILE_PATH = 'environments/.posts.env';
 export const RABBITMQ_SERVICE = Symbol('RABBITMQ_SERVICE');
 export const PHOTO_FILE_TYPES = /jpeg|jpg|png/;
 export const PHOTO_FILE_SIZE = 1024 * 1024;
+export const MAX_SEARCHED_POSTS = 20;
