@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { getRabbitMqConfig } from './config/rabbitmq.config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 
 async function bootstrap() {
@@ -14,6 +15,14 @@ async function bootstrap() {
   app.connectMicroservice(getRabbitMqConfig(configService));
 
   await app.startAllMicroservices();
+
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle("The 'Notify' service")
+    .setDescription('Notify service api')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('spec', app, document);
 
   const port = process.env.PORT || 3335;
   await app.listen(port);
