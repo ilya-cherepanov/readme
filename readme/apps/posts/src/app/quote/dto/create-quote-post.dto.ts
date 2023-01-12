@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { transformTagArray } from "../../../../utils/helpers";
 import { Transform } from "class-transformer";
 import { ArrayMaxSize, IsArray, IsOptional, IsString, Length, Matches } from "class-validator";
-import { QuotePostAuthor, QuotePostText, Tag, TAG_FORMAT } from "../../posts.constants";
+import { QuotePostAuthor, QuotePostText, Tag, TAGS_NOT_VALID, TAG_FORMAT } from "../../posts.constants";
 
 
 export class CreateQuotePostDTO {
@@ -12,7 +12,7 @@ export class CreateQuotePostDTO {
     required: false,
   })
   @Transform(({value}) => transformTagArray(value))
-  @Matches(TAG_FORMAT, {each: true})
+  @Matches(TAG_FORMAT, {each: true, message: TAGS_NOT_VALID})
   @Length(Tag.MinLength, Tag.MaxLength, {each: true})
   @IsString({each: true})
   @ArrayMaxSize(Tag.MaxCount)

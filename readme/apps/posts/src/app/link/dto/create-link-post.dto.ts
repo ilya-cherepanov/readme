@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { transformTagArray } from "../../../../utils/helpers";
 import { Transform } from "class-transformer";
 import { ArrayMaxSize, IsArray, IsOptional, IsString, IsUrl, Length, Matches, MaxLength } from 'class-validator';
-import { LinkPostDescription, Tag, TAG_FORMAT } from "../../posts.constants";
+import { LinkPostDescription, Tag, TAGS_NOT_VALID, TAG_FORMAT } from "../../posts.constants";
 
 
 export class CreateLinkPostDTO {
@@ -13,7 +13,7 @@ export class CreateLinkPostDTO {
   })
   @Transform(({value}) => transformTagArray(value))
   @Matches(TAG_FORMAT, {each: true})
-  @Length(Tag.MinLength, Tag.MaxLength, {each: true})
+  @Length(Tag.MinLength, Tag.MaxLength, {each: true, message: TAGS_NOT_VALID})
   @IsString({each: true})
   @ArrayMaxSize(Tag.MaxCount)
   @IsArray()

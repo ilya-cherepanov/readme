@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { transformTagArray } from "../../../../utils/helpers";
 import { Transform } from "class-transformer";
 import { ArrayMaxSize, IsArray, IsOptional, IsString, IsUrl, Length, Matches } from "class-validator";
-import { Tag, TAG_FORMAT, VideoPostTitle, VIDEO_HOST_WHITELIST } from "../../posts.constants";
+import { Tag, TAG_FORMAT, TAGS_NOT_VALID, VideoPostTitle, VIDEO_HOST_WHITELIST } from "../../posts.constants";
 
 
 export class CreateVideoPostDTO {
@@ -12,7 +12,7 @@ export class CreateVideoPostDTO {
     required: false,
   })
   @Transform(({value}) => transformTagArray(value))
-  @Matches(TAG_FORMAT, {each: true, message: 'Each tag must start with a letter and not contain spaces'})
+  @Matches(TAG_FORMAT, {each: true, message: TAGS_NOT_VALID})
   @Length(Tag.MinLength, Tag.MaxLength, {each: true})
   @IsString({each: true})
   @ArrayMaxSize(Tag.MaxCount)
