@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { transformTagArray } from "apps/posts/utils/helpers";
+import { transformTagArray } from "../../../../utils/helpers";
 import { Transform } from "class-transformer";
 import { ArrayMaxSize, IsArray, IsOptional, IsString, Length, Matches } from "class-validator";
 import { Tag, TAGS_NOT_VALID, TAG_FORMAT } from "../../posts.constants";

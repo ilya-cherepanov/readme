@@ -9,7 +9,7 @@ import { ConfigModule } from '@nestjs/config';
 import envSchema from './env.schema';
 import { rabbitMqOptions } from '../../config/rabbitmq.config';
 import { ENV_FILE_PATH } from './posts.constants';
-import { uploadFilesOptions } from 'apps/posts/config/upload-files.config';
+import { uploadFilesOptions } from '../../config/upload-files.config';
 import { jwtOptions } from '../../config/jwt.config';
 import { CommentsModule } from './comments/comments.module';
 

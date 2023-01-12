@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { PostEntity } from '../post.entity';
 import { SortingParams } from '../../../types/sorting-params.inteface';
 import { MAX_SEARCHED_POSTS } from '../posts.constants';
-import { SortOrder } from 'apps/posts/types/sort-order.enum';
+import { SortOrder } from '../../../types/sort-order.enum';
 
 
 @Injectable()
