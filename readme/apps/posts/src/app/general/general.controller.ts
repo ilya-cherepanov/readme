@@ -1,5 +1,5 @@
 import { Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseBoolPipe, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { fillObject, MongoIdValidationPipe } from '@readme/core';
 import { Request } from 'express';
 import { GeneralService } from './general.service';
@@ -21,13 +21,17 @@ export class GeneralController {
     status: HttpStatus.OK,
     description: 'Получить опубликованные посты'
   })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Не валидный запрос!'
+  })
   async getPosts(@Query() query: GetPostsQuery) {
     const posts = await this.generalService.get(query);
 
     return fillObject(PostRDO, posts);
   }
 
-  @Get(':id')
+  @Get('post/:id')
   @ApiParam({
     name: 'id',
     description: 'ID поста',
@@ -38,9 +42,12 @@ export class GeneralController {
     status: HttpStatus.OK,
     description: 'Получить один опубликованный пост'
   })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Не валидный запрос!'
+  })
   async getPost(@Param('id', ParseIntPipe) id: number) {
     const post = await this.generalService.getOne(id);
-    console.log(post);
 
     return fillObject(PostRDO, post);
   }
@@ -51,6 +58,10 @@ export class GeneralController {
     status: HttpStatus.OK,
     description: 'Ищет опубликованный посты по названию'
   })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Не валидный запрос!'
+  })
   async search(@Query() query: SearchPostQuery) {
     const posts = await this.generalService.search(query);
 
@@ -59,13 +70,18 @@ export class GeneralController {
 
   @Get('draft')
   @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
   @ApiResponse({
     type: [PostRDO],
     status: HttpStatus.OK,
     description: 'Получает посты-черновики'
   })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Пользователь не авторизован!'
+  })
   async getDraft(@Req() request: Request) {
-    const posts = await this.getDraft(request.user['id']);
+    const posts = await this.generalService.getDraft(request.user['id']);
 
     return fillObject(PostRDO, posts);
   }
@@ -76,12 +92,17 @@ export class GeneralController {
     status: HttpStatus.OK,
     description: 'Возвращает количество публикаций пользователя с конкретным ID',
   })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Не валидный запрос!'
+  })
   async getPostCountByUserId(@Param('userId', MongoIdValidationPipe) userId: string) {
     return fillObject(PostCountRDO, await this.generalService.getPostCountByUserId(userId));
   }
 
   @Post(':id/repost')
   @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
   @ApiParam({
     name: 'id',
     description: 'ID поста',
@@ -90,7 +111,19 @@ export class GeneralController {
   @ApiResponse({
     type: PostRDO,
     status: HttpStatus.OK,
-    description: 'Сделать репост',
+    description: 'Создает репост репост',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Пользователь не авторизован!'
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Публикация не найдена!'
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Не валидный запрос!'
   })
   async repost(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
     const repostedPost = await this.generalService.repost(id, request.user['id']);
@@ -100,6 +133,7 @@ export class GeneralController {
 
   @Delete(':id')
   @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
   @ApiParam({
     name: 'id',
     description: 'ID поста',
@@ -109,12 +143,25 @@ export class GeneralController {
     status: HttpStatus.OK,
     description: 'Удалить пост по ID'
   })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Публикация не найдена!'
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Пользователь не авторизован или не является создателем поста!'
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Не валидный запрос!'
+  })
   async deletePost(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
     await this.generalService.delete(id, request.user['id']);
   }
 
   @Post(':id/like/:state')
   @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @ApiParam({
     name: 'id',
@@ -127,12 +174,48 @@ export class GeneralController {
     example: true
   })
   @ApiResponse({
+    type: PostRDO,
     status: HttpStatus.OK,
     description: 'Установить лайк',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Не валидный запрос!'
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Пользователь не авторизован!'
   })
   async setLike(@Param('id', ParseIntPipe) id: number, @Param('state', ParseBoolPipe) state: boolean, @Req() request: Request) {
     const likedPost = await this.generalService.setLike(id, request.user['id'], state);
 
     return fillObject(PostRDO, likedPost);
+  }
+
+  @Post(':id/publish/:state')
+  @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    type: PostRDO,
+    status: HttpStatus.OK,
+    description: 'Установить состояние публикации',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Публикация не найдена!'
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Не валидный запрос!'
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Пользователь не авторизован!'
+  })
+  async publish(@Param('id', ParseIntPipe) id: number, @Param('state', ParseBoolPipe) state: boolean, @Req() request: Request) {
+    const post = await this.generalService.publishPost(id, request.user['id'], state)
+
+    return fillObject(PostRDO, post);
   }
 }

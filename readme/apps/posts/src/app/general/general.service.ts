@@ -1,9 +1,7 @@
 import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Post, isLinkPost, isPhotoPost, isQuotePost, isTextPost, isVideoPost, PostStatus } from '@readme/shared-types';
 import { LinkPostEntity, PhotoPostEntity, PostEntity, QuotePostEntity, TextPostEntity, VideoPostEntity } from '../post.entity';
-import { MAX_SEARCHED_POSTS } from '../posts.constants';
-import { LikePostDTO } from './dto/like-post.dto';
-import { RepostPostDTO } from './dto/repost-post.dto';
+import { MAX_SEARCHED_POSTS, POST_ALREADY_REPOSTED, POST_DOES_NOT_EXIST, UNKNOWN_POST_TYPE, USER_IS_NOT_AUTHOR, USER_IS_POST_CREATOR } from '../posts.constants';
 import { PostRepository } from './post.repository';
 import { GetPostsQuery } from './query/get-posts.query';
 import { SearchPostQuery } from './query/search-post.query';
@@ -26,7 +24,7 @@ export class GeneralService {
   async getOne(id: number) {
     const post = await this.postRepository.findById(id);
     if (post.postStatus !== PostStatus.Published) {
-      throw new NotFoundException('Post with given ID does not exist!');
+      throw new NotFoundException(POST_DOES_NOT_EXIST);
     }
 
     return post;
@@ -43,17 +41,17 @@ export class GeneralService {
   async repost(postId: number, userId: string) {
     const existingPost = await this.postRepository.findById(postId);
     if (!existingPost) {
-      throw new NotFoundException('Post with given ID does not exist!');
+      throw new NotFoundException(POST_DOES_NOT_EXIST);
     }
 
     if (existingPost.creatorId === userId) {
-      throw new BadRequestException('User with given ID is creator of the post!');
+      throw new BadRequestException(USER_IS_POST_CREATOR);
     }
 
     const originalPostId = existingPost.isRePost ? existingPost.originalPostId : existingPost.id;
 
-    if (await this.postRepository.isReposted(originalPostId, userId)) {
-      throw new BadRequestException('The post has been already reposted!');
+    if (await this.postRepository.isAlreadyReposted(originalPostId, userId)) {
+      throw new BadRequestException(POST_ALREADY_REPOSTED);
     }
 
     const newPost: Post = {
@@ -64,21 +62,7 @@ export class GeneralService {
       authorId: userId,
     };
 
-    let newPostEntity: PostEntity;
-
-    if (isTextPost(newPost)) {
-      newPostEntity = new TextPostEntity(newPost);
-    } else if (isVideoPost(newPost)) {
-      newPostEntity = new VideoPostEntity(newPost);
-    } else if (isQuotePost(newPost)) {
-      newPostEntity = new QuotePostEntity(newPost);
-    } else if (isLinkPost(newPost)) {
-      newPostEntity = new LinkPostEntity(newPost);
-    } else if (isPhotoPost(newPost)) {
-      newPostEntity = new PhotoPostEntity(newPost);
-    } else {
-      throw new InternalServerErrorException('Unable to determine the type of post!');
-    }
+    const newPostEntity = this.createPostEntity(newPost);
 
     return this.postRepository.create(newPostEntity);
   }
@@ -97,14 +81,35 @@ export class GeneralService {
     const existingPost = await this.postRepository.findById(id);
 
     if (!existingPost) {
-      throw new NotFoundException('Post with given ID does not exist!');
+      throw new NotFoundException(POST_DOES_NOT_EXIST);
     }
 
     if (existingPost.authorId !== userId) {
-      throw new ForbiddenException('User is not an author of the post!');
+      throw new ForbiddenException(USER_IS_NOT_AUTHOR);
     }
 
     await this.postRepository.destroy(id);
+  }
+
+  async publishPost(id: number, userId: string, state: boolean) {
+    const existingPost = await this.postRepository.findById(id);
+
+    if (!existingPost) {
+      throw new NotFoundException(POST_DOES_NOT_EXIST);
+    }
+    if (existingPost.authorId !== userId) {
+      throw new ForbiddenException(USER_IS_NOT_AUTHOR);
+    }
+
+    const postEntity = this.createPostEntity(existingPost);
+    if (state) {
+      postEntity.postStatus = PostStatus.Published;
+      postEntity.publishedAt = new Date();
+    } else {
+      postEntity.postStatus = PostStatus.Draft;
+    }
+
+    return this.postRepository.update(id, postEntity);
   }
 
   async getPostCountByUserId(userId: string) {
@@ -113,5 +118,21 @@ export class GeneralService {
     return {
       count,
     };
+  }
+
+  private createPostEntity(post: Post): PostEntity {
+    if (isTextPost(post)) {
+      return new TextPostEntity(post);
+    } else if (isVideoPost(post)) {
+      return new VideoPostEntity(post);
+    } else if (isQuotePost(post)) {
+      return new QuotePostEntity(post);
+    } else if (isLinkPost(post)) {
+      return new LinkPostEntity(post);
+    } else if (isPhotoPost(post)) {
+      return new PhotoPostEntity(post);
+    } else {
+      throw new InternalServerErrorException(UNKNOWN_POST_TYPE);
+    }
   }
 }

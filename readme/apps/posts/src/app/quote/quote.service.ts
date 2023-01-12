@@ -4,7 +4,7 @@ import { QuotePostEntity } from '../post.entity';
 import { CreateQuotePostDTO } from './dto/create-quote-post.dto';
 import { UpdateQuotePostDTO } from './dto/update-quote-post.dto';
 import { PostRepository } from '../general/post.repository';
-import { RABBITMQ_SERVICE } from '../posts.constants';
+import { NOT_QUOTE_POST, POST_DOES_NOT_EXIST, RABBITMQ_SERVICE, USER_IS_NOT_POST_CREATOR } from '../posts.constants';
 import { ClientProxy } from '@nestjs/microservices';
 
 
@@ -15,7 +15,7 @@ export class QuoteService {
     @Inject(RABBITMQ_SERVICE) private readonly rabbitClient: ClientProxy,
   ) {}
 
-  async create(userId: string, dto: CreateQuotePostDTO) {
+  async create(userId: string, dto: CreateQuotePostDTO, userName: string) {
     const newQuotePostEntity = new QuotePostEntity({
       ...dto,
       creatorId: userId,
@@ -32,7 +32,7 @@ export class QuoteService {
     this.rabbitClient.emit(
       {cmd: CommandEvent.CreatePost},
       {
-        title: 'Пользователь опубликовал новую цитату',
+        title: `Пользователь, ${userName} опубликовал новую цитату`,
         postId: newPost.id,
       },
     );
@@ -44,13 +44,13 @@ export class QuoteService {
     const existingPost = await this.postRepository.findById(id);
 
     if (!existingPost) {
-      throw new NotFoundException('Post with given ID does not exist!');
+      throw new NotFoundException(POST_DOES_NOT_EXIST);
     }
     if (existingPost.creatorId !== userId) {
-      throw new ForbiddenException('User is not a creator of the post');
+      throw new ForbiddenException(USER_IS_NOT_POST_CREATOR);
     }
     if (!isQuotePost(existingPost)) {
-      throw new BadRequestException('Post with given ID is not quote post!');
+      throw new BadRequestException(NOT_QUOTE_POST);
     }
 
     const updatedQuotePostEntity = new QuotePostEntity({

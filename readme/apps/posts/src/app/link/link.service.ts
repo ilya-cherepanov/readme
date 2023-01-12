@@ -4,7 +4,7 @@ import { LinkPostEntity } from '../post.entity';
 import { CreateLinkPostDTO } from './dto/create-link-post.dto';
 import { UpdateLinkPostDTO } from './dto/update-link-post.dto';
 import { PostRepository } from '../general/post.repository';
-import { RABBITMQ_SERVICE } from '../posts.constants';
+import { NOT_LINK_POST, POST_DOES_NOT_EXIST, RABBITMQ_SERVICE, USER_IS_NOT_POST_CREATOR } from '../posts.constants';
 import { ClientProxy } from '@nestjs/microservices';
 
 
@@ -15,7 +15,7 @@ export class LinkService {
     @Inject(RABBITMQ_SERVICE) private readonly rabbitClient: ClientProxy,
   ) {}
 
-  async create(userId: string, dto: CreateLinkPostDTO) {
+  async create(userId: string, dto: CreateLinkPostDTO, userName: string) {
     const newLinkPostEntity = new LinkPostEntity({
       ...dto,
       creatorId: userId,
@@ -32,7 +32,7 @@ export class LinkService {
     this.rabbitClient.emit(
       {cmd: CommandEvent.CreatePost},
       {
-        title: 'Пользователь опубликовал новую ссылку',
+        title: `Пользователь, ${userName} опубликовал новую ссылку`,
         postId: newPost.id,
       },
     );
@@ -44,13 +44,13 @@ export class LinkService {
     const existingPost = await this.postRepository.findById(id);
 
     if (!existingPost) {
-      throw new NotFoundException('Post with given ID does not exist!');
+      throw new NotFoundException(POST_DOES_NOT_EXIST);
     }
     if (existingPost.creatorId !== userId) {
-      throw new ForbiddenException('User is not the creator of the post!');
+      throw new ForbiddenException(USER_IS_NOT_POST_CREATOR);
     }
     if (!isLinkPost(existingPost)) {
-      throw new BadRequestException('Post with given ID is not link post!');
+      throw new BadRequestException(NOT_LINK_POST);
     }
 
     const updatedLinkPostEntity = new LinkPostEntity({

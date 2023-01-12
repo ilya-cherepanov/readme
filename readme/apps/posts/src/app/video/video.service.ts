@@ -4,7 +4,7 @@ import { VideoPostEntity } from '../post.entity';
 import { CreateVideoPostDTO } from './dto/create-video-post.dto';
 import { UpdateVideoPostDTO } from './dto/update-video-post.dto';
 import { PostRepository } from '../general/post.repository';
-import { RABBITMQ_SERVICE } from '../posts.constants';
+import { NOT_VIDEO_POST, POST_DOES_NOT_EXIST, RABBITMQ_SERVICE, USER_IS_NOT_POST_CREATOR } from '../posts.constants';
 import { ClientProxy } from '@nestjs/microservices';
 
 
@@ -44,13 +44,13 @@ export class VideoService {
     const existingPost = await this.postRepository.findById(id);
 
     if (!existingPost) {
-      throw new NotFoundException('Post with given ID does not exist!');
+      throw new NotFoundException(POST_DOES_NOT_EXIST);
     }
     if (existingPost.creatorId !== userId) {
-      throw new ForbiddenException('User is not a creator of the post');
+      throw new ForbiddenException(USER_IS_NOT_POST_CREATOR);
     }
     if (!isVideoPost(existingPost)) {
-      throw new BadRequestException('Post with given ID is not video post!');
+      throw new BadRequestException(NOT_VIDEO_POST);
     }
 
     const updatedVideoPostEntity = new VideoPostEntity({

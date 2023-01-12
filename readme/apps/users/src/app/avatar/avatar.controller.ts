@@ -1,6 +1,6 @@
 import { Controller, HttpStatus, ParseFilePipeBuilder, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AVATAR_FILE_SIZE, AVATAR_FILE_TYPES } from '../user.constants';
 import { JWTAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AvatarService } from './avatar.service';
@@ -19,6 +19,7 @@ export class AvatarController {
 
   @Post()
   @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
   @UseInterceptors(FileInterceptor('avatar'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({

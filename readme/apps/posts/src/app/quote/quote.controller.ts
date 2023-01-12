@@ -1,5 +1,5 @@
 import { Body, Controller, HttpStatus, Param, ParseIntPipe, Patch, Post, Req, UseGuards } from '@nestjs/common';
-import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { fillObject } from '@readme/core';
 import { JWTAuthGuard } from '../general/guards/jwt-auth.guard';
 import { PostRDO } from '../general/rdo/post.rdo';
@@ -16,30 +16,50 @@ export class QuoteController {
 
   @Post()
   @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
   @ApiResponse({
+    type: PostRDO,
     status: HttpStatus.CREATED,
     description: 'Создана публикация-цитата',
   })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Пользователь не авторизован!'
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Введены не валидные данные!'
+  })
   async create(@Body() dto: CreateQuotePostDTO, @Req() request: Request) {
-    const newQuotePost = await this.quoteService.create(request.user['id'], dto);
+    const newQuotePost = await this.quoteService.create(request.user['id'], dto, request.user['name']);
 
     return fillObject(PostRDO, newQuotePost);
   }
 
   @Patch(':id')
   @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
   @ApiParam({
     name: 'id',
     description: 'ID поста',
     example: 10,
   })
   @ApiResponse({
+    type: PostRDO,
     status: HttpStatus.OK,
     description: 'Изменена публикация-цитата',
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: 'Публикация не найдена!'
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Пользователь не авторизован или не является создателем поста!',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Введены не валидные данные!'
   })
   async update(@Param('id', ParseIntPipe) id: number, @Req() request: Request, @Body() dto: UpdateQuotePostDTO) {
     const updatedQuotePost = await this.quoteService.update(id, request.user['id'], dto);

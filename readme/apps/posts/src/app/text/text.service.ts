@@ -4,7 +4,7 @@ import { TextPostEntity } from '../post.entity';
 import { CreateTextPostDTO } from './dto/create-text-post.dto';
 import { UpdateTextPostDTO } from './dto/update-text-post.dto';
 import { PostRepository } from '../general/post.repository';
-import { RABBITMQ_SERVICE } from '../posts.constants';
+import { NOT_TEXT_POST, POST_DOES_NOT_EXIST, RABBITMQ_SERVICE, USER_IS_NOT_POST_CREATOR } from '../posts.constants';
 import { ClientProxy } from '@nestjs/microservices';
 
 
@@ -44,13 +44,13 @@ export class TextService {
     const existingPost = await this.postRepository.findById(id);
 
     if (!existingPost) {
-      throw new NotFoundException('Post with given ID does not exist!');
+      throw new NotFoundException(POST_DOES_NOT_EXIST);
     }
     if (existingPost.creatorId !== userId) {
-      throw new ForbiddenException('User is not a creator of the post');
+      throw new ForbiddenException(USER_IS_NOT_POST_CREATOR);
     }
     if (!isTextPost(existingPost)) {
-      throw new BadRequestException('Post with given ID is not text post!');
+      throw new BadRequestException(NOT_TEXT_POST);
     }
 
     const updatedTextPostEntity = new TextPostEntity({

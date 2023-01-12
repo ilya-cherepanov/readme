@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PostRepository } from '../general/post.repository';
 import { CommentEntity } from './comment.entity';
 import { CommentRepository } from './comment.repository';
@@ -34,9 +34,13 @@ export class CommentsService {
     return this.commentsRepository.create(newCommentEntity);
   }
 
-  async delete(id: number) {
-    if (!this.commentsRepository.findById(id)) {
+  async delete(id: number, userId: string) {
+    const comment = await this.commentsRepository.findById(id);
+    if (!comment) {
       throw new NotFoundException(COMMENT_NOT_FOUND);
+    }
+    if (comment.authorId !== userId) {
+      throw new ForbiddenException('User is not the author of the comment!');
     }
 
     await this.commentsRepository.destroy(id);

@@ -4,7 +4,7 @@ import { PhotoPostEntity } from '../post.entity';
 import { CreatePhotoPostDTO } from './dto/create-photo-post.dto';
 import { UpdatePhotoPostDTO } from './dto/update-photo-post.dto';
 import { PostRepository } from '../general/post.repository';
-import { RABBITMQ_SERVICE } from '../posts.constants';
+import { NOT_PHOTO_POST, POST_DOES_NOT_EXIST, RABBITMQ_SERVICE, USER_IS_NOT_POST_CREATOR } from '../posts.constants';
 import { ClientProxy } from '@nestjs/microservices';
 
 
@@ -31,7 +31,7 @@ export class PhotoService {
     this.rabbitClient.emit(
       {cmd: CommandEvent.CreatePost},
       {
-        title: 'Пользователь опубликовал новую фотографию',
+        title: `Пользователь опубликовал новую фотографию`,
         postId: newPost.id,
       },
     );
@@ -39,7 +39,7 @@ export class PhotoService {
     return newPost;
   }
 
-  async savePhoto(userId: string, filename: string) {
+  async savePhoto(userId: string, filename: string, userName: string) {
     const newPhotoPostEntity = new PhotoPostEntity({
       photo: filename,
       creatorId: userId,
@@ -56,7 +56,7 @@ export class PhotoService {
     this.rabbitClient.emit(
       {cmd: CommandEvent.CreatePost},
       {
-        title: 'Пользователь опубликовал новую фотографию',
+        title: `Пользователь, ${userName} опубликовал новую фотографию`,
         postId: newPost.id,
       },
     );
@@ -68,13 +68,13 @@ export class PhotoService {
     const existingPost = await this.postRepository.findById(id);
 
     if (!existingPost) {
-      throw new NotFoundException('Post with given ID does not exist!');
+      throw new NotFoundException(POST_DOES_NOT_EXIST);
     }
     if (existingPost.creatorId !== userId) {
-      throw new ForbiddenException('User is not a creator of the post');
+      throw new ForbiddenException(USER_IS_NOT_POST_CREATOR);
     }
     if (!isPhotoPost(existingPost)) {
-      throw new BadRequestException('Post with given ID is not photo post!');
+      throw new BadRequestException(NOT_PHOTO_POST);
     }
 
     const updatedPhotoPostEntity = new PhotoPostEntity({

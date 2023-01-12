@@ -3,8 +3,9 @@ import { CRUDRepository } from '@readme/core';
 import { Post, PostCategory, PostStatus } from '@readme/shared-types';
 import { PrismaService } from '../prisma/prisma.service';
 import { PostEntity } from '../post.entity';
-import { SortingParams } from '../types/sorting-params.inteface';
+import { SortingParams } from '../../../types/sorting-params.inteface';
 import { MAX_SEARCHED_POSTS } from '../posts.constants';
+import { SortOrder } from 'apps/posts/types/sort-order.enum';
 
 
 @Injectable()
@@ -44,25 +45,36 @@ export class PostRepository implements CRUDRepository<PostEntity, number, Post> 
           select: {likes: true, comments: true},
         },
       },
-      orderBy: {
-        publishedAt: sorting.sortByPublish,
-      },
       skip,
       take: limit,
     };
 
+    const orderBy = [];
     if (sorting.sortByLikes) {
-      query.orderBy = [
-        {
-          likes: {
-            _count: sorting.sortByLikes,
-          },
+      orderBy.push({
+        likes: {
+          _count: sorting.sortByLikes,
         },
-        {
-          publishedAt: sorting.sortByPublish,
-        },
-      ];
+      });
     }
+    if (sorting.sortByComments) {
+      orderBy.push({
+        comments: {
+          _count: sorting.sortByComments,
+        },
+      });
+    }
+    if (sorting.sortByPublish) {
+      orderBy.push({
+        publishedAt: sorting.sortByPublish,
+      });
+    } else {
+      orderBy.push({
+        publishedAt: SortOrder.Descending,
+      });
+    }
+
+    query.orderBy = orderBy;
 
     const dbPosts = await this.prismaService.post.findMany(query);
     const publishedPosts: Post[] = dbPosts.map((dbPost) => ({
@@ -109,7 +121,7 @@ export class PostRepository implements CRUDRepository<PostEntity, number, Post> 
     return posts as Post[]
   }
 
-  async isReposted(postId: number, userId: string): Promise<boolean> {
+  async isAlreadyReposted(postId: number, userId: string): Promise<boolean> {
     const count = await this.prismaService.post.count({
       where: {
         originalPostId: postId,

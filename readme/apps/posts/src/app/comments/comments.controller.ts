@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { fillObject } from '@readme/core';
 import { CommentsService } from './comments.service';
 import { CreateCommentDTO } from './dto/create-comment.dto';
@@ -20,6 +20,16 @@ export class CommentsController {
     status: HttpStatus.OK,
     description: 'Получить комментарии для поста с соответствующим ID',
   })
+  @ApiParam({
+    name: 'postId',
+    description: 'ID поста',
+    example: 10,
+    type: Number,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Поста с данным ID не существует',
+  })
   async get(@Param('postId', ParseIntPipe) postId: number, @Query() query: GetCommentsQuery) {
     const comments = await this.commentsService.get(postId, query);
 
@@ -28,10 +38,15 @@ export class CommentsController {
 
   @Post('')
   @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
   @ApiResponse({
     type: CommentRDO,
     status: HttpStatus.CREATED,
     description: 'Создать комментарии для поста с соответствующим ID',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Не валидный запрос!'
   })
   async create(@Req() request: Request, @Body() dto: CreateCommentDTO) {
     const newComment = await this.commentsService.create(request.user['id'], dto);
@@ -41,16 +56,30 @@ export class CommentsController {
 
   @Delete(':id')
   @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
   @ApiParam({
     name: 'id',
     description: 'ID комментария',
     example: 10,
+    type: Number,
   })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Удалить комментарий по ID'
   })
-  async delete(@Param('id', ParseIntPipe) id: number) {
-    await this.commentsService.delete(id);
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Комментарий с данным ID не найден'
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Не валидный запрос!'
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Пользователь не авторизован или не является автором комментария'
+  })
+  async delete(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
+    await this.commentsService.delete(id, request.user['id']);
   }
 }

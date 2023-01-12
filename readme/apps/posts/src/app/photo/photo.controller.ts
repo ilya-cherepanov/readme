@@ -1,6 +1,6 @@
 import { Body, Controller, HttpStatus, Param, ParseFilePipeBuilder, ParseIntPipe, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { fillObject } from '@readme/core';
 import { PostRDO } from '../general/rdo/post.rdo';
 import { UpdatePhotoPostDTO } from './dto/update-photo-post.dto';
@@ -18,6 +18,7 @@ export class PhotoController {
 
   @Post()
   @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
   @UseInterceptors(FileInterceptor('photo'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -25,8 +26,17 @@ export class PhotoController {
     type: PhotoUploadDTO,
   })
   @ApiResponse({
+    type: PostRDO,
     status: HttpStatus.CREATED,
     description: 'Создает публикация-фотографию',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Пользователь не авторизован!'
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Введены не валидные данные!'
   })
   async create(@UploadedFile(
     new ParseFilePipeBuilder()
@@ -34,19 +44,21 @@ export class PhotoController {
       .addMaxSizeValidator({maxSize: PHOTO_FILE_SIZE})
       .build()
     ) file: Express.Multer.File, @Req() request: Request) {
-      const createdPhotoPost = await this.photoService.savePhoto(request.user['id'], file.filename);
+      const createdPhotoPost = await this.photoService.savePhoto(request.user['id'], file.filename, request.user['name']);
 
       return fillObject(PostRDO, createdPhotoPost);
   }
 
   @Patch(':id')
   @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
   @ApiParam({
     name: 'id',
     description: 'ID поста',
     example: 10,
   })
   @ApiResponse({
+    type: PostRDO,
     status: HttpStatus.OK,
     description: 'Изменяет публикация фотографию',
   })
@@ -54,9 +66,16 @@ export class PhotoController {
     status: HttpStatus.NOT_FOUND,
     description: 'Публикация не найдена!'
   })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Пользователь не авторизован или не является создателем поста!',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Введены не валидные данные!'
+  })
   async update(@Param('id', ParseIntPipe) id: number, @Req() request: Request, @Body() dto: UpdatePhotoPostDTO) {
     const updatedPhotoPost = await this.photoService.update(id, request.user['id'], dto);
-    console.log(dto);
 
     return fillObject(PostRDO, updatedPhotoPost);
   }

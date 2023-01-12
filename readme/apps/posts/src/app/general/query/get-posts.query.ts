@@ -3,7 +3,7 @@ import { PostCategory } from "@readme/shared-types";
 import { Transform } from "class-transformer";
 import { IsEnum, IsInt, IsOptional, Min } from "class-validator";
 import { DEFAULT_POSTS_PER_PAGE } from "../../posts.constants";
-import { SortOrder } from "../../types/sort-order.enum";
+import { SortOrder } from "../../../../types/sort-order.enum";
 
 
 export class GetPostsQuery {

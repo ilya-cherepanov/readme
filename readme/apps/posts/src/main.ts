@@ -15,6 +15,7 @@ async function bootstrap() {
   }));
 
   const swaggerConfig = new DocumentBuilder()
+    .addBearerAuth()
     .setTitle("The 'Posts' service")
     .setDescription('Posts service api')
     .setVersion('1.0')

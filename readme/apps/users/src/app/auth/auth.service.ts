@@ -42,6 +42,7 @@ export class AuthService {
     const tokens = await this.getTokens({
       id: newUser._id.toString(),
       email: newUser.email,
+      name: newUser.name,
     });
     await newUserEntity.setRefreshToken(tokens.refreshToken);
     await this.userRepository.update(newUser._id.toString(), newUserEntity);
@@ -72,6 +73,7 @@ export class AuthService {
     const tokens = await this.getTokens({
       id: userEntity._id,
       email: userEntity.email,
+      name: userEntity.name,
     });
 
     await userEntity.setRefreshToken(tokens.refreshToken);
@@ -111,7 +113,8 @@ export class AuthService {
 
     const tokens = await this.getTokens({
       id: userEntity._id.toString(),
-      email: userEntity.email
+      email: userEntity.email,
+      name: userEntity.name,
     });
 
     await userEntity.setRefreshToken(tokens.refreshToken);

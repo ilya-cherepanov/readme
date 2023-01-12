@@ -1,6 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { ArrayMaxSize, IsArray, IsOptional, IsString, Length } from "class-validator";
-import { QuotePostAuthor, QuotePostText, Tag } from "../../posts.constants";
+import { transformTagArray } from "../../../../utils/helpers";
+import { Transform } from "class-transformer";
+import { ArrayMaxSize, IsArray, IsOptional, IsString, Length, Matches } from "class-validator";
+import { QuotePostAuthor, QuotePostText, Tag, TAG_FORMAT } from "../../posts.constants";
 
 
 export class CreateQuotePostDTO {
@@ -9,6 +11,8 @@ export class CreateQuotePostDTO {
     example: ['IT', 'frontend', 'backend'],
     required: false,
   })
+  @Transform(({value}) => transformTagArray(value))
+  @Matches(TAG_FORMAT, {each: true})
   @Length(Tag.MinLength, Tag.MaxLength, {each: true})
   @IsString({each: true})
   @ArrayMaxSize(Tag.MaxCount)

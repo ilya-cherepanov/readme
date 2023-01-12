@@ -1,7 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { transformTagArray } from "apps/posts/utils/helpers";
 import { Transform } from "class-transformer";
-import { ArrayMaxSize, IsArray, IsOptional, IsString, Length } from "class-validator";
-import { Tag } from "../../posts.constants";
+import { ArrayMaxSize, IsArray, IsOptional, IsString, Length, Matches } from "class-validator";
+import { Tag, TAG_FORMAT } from "../../posts.constants";
 
 
 export class UpdatePhotoPostDTO {
@@ -10,7 +11,8 @@ export class UpdatePhotoPostDTO {
     example: ['IT', 'frontend', 'backend'],
     required: false,
   })
-  @Transform(({value}) => value.map((tag: string) => tag.toLowerCase()))
+  @Transform(({value}) => transformTagArray(value))
+  @Matches(TAG_FORMAT, {each: true})
   @Length(Tag.MinLength, Tag.MaxLength, {each: true})
   @IsString({each: true})
   @ArrayMaxSize(Tag.MaxCount)

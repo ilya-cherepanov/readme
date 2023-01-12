@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Req, UseGuards } from '@nestjs/common';
-import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { fillObject, MongoIdValidationPipe } from '@readme/core';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
@@ -72,6 +72,7 @@ export class AuthController {
   @Post('refresh')
   @UseGuards(JWTRefreshGuard)
   @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
   @ApiResponse({
     type: TokensRDO,
     status: HttpStatus.OK,
@@ -88,6 +89,7 @@ export class AuthController {
 
   @Post('change-password')
   @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
