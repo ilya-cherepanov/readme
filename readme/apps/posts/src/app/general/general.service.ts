@@ -1,7 +1,7 @@
 import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Post, isLinkPost, isPhotoPost, isQuotePost, isTextPost, isVideoPost, PostStatus } from '@readme/shared-types';
 import { LinkPostEntity, PhotoPostEntity, PostEntity, QuotePostEntity, TextPostEntity, VideoPostEntity } from '../post.entity';
-import { MAX_SEARCHED_POSTS, POST_ALREADY_REPOSTED, POST_DOES_NOT_EXIST, UNKNOWN_POST_TYPE, USER_IS_NOT_AUTHOR, USER_IS_POST_CREATOR } from '../posts.constants';
+import { MAX_SEARCHED_POSTS, POST_ALREADY_REPOSTED, POST_DOES_NOT_EXIST, POST_NOT_PUBLISHED, UNKNOWN_POST_TYPE, USER_IS_NOT_AUTHOR, USER_IS_POST_CREATOR } from '../posts.constants';
 import { PostRepository } from './post.repository';
 import { GetPostsQuery } from './query/get-posts.query';
 import { SearchPostQuery } from './query/search-post.query';
@@ -74,6 +74,12 @@ export class GeneralService {
   }
 
   async setLike(postId: number, userId: string, state: boolean) {
+    const post = await this.postRepository.findById(postId);
+
+    if (post.postStatus !== PostStatus.Published) {
+      throw new ForbiddenException(POST_NOT_PUBLISHED);
+    }
+
     if (state) {
       await this.postRepository.createLike(postId, userId);
     } else {

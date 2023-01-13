@@ -1,4 +1,4 @@
-@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzYjliODQ3MzMzN2ZjMzhhMjkxMWRkZiIsImVtYWlsIjoiam9obkBlbWFpbC5jb20iLCJuYW1lIjoiSm9obiBDb25ub3IiLCJpYXQiOjE2NzM1NjgwNzIsImV4cCI6MTY3MzU2ODM3Mn0.45Wp1thL7aO5n4uDdDT_3hkGXhOh2kjtOYdRYuDkhew
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzYjliODQ3MzMzN2ZjMzhhMjkxMWRkZiIsImVtYWlsIjoiam9obkBlbWFpbC5jb20iLCJuYW1lIjoiSm9obiBDb25ub3IiLCJpYXQiOjE2NzM1NzM4NjcsImV4cCI6MTY3MzU3NDE2N30.4xM-1w6yxLufbODLZIBSLEM7dzDltIw8krSKIAx-5fE
 
 ###
 
@@ -163,14 +163,14 @@ Authorization: Bearer {{accessToken}}
 ###
 
 # Set like
-POST http://localhost:3333/api/67/like/true HTTP/1.1
+POST http://localhost:3333/api/64/like/true HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 ###
 
 # Publish post
-POST http://localhost:3333/api/67/publish/false HTTP/1.1
+POST http://localhost:3333/api/64/publish/true HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 

@@ -60,3 +60,4 @@ export const NOT_TEXT_POST = 'Post with given ID is not text post!';
 export const NOT_PHOTO_POST = 'Post with given ID is not photo post!';
 export const NOT_QUOTE_POST = 'Post with given ID is not quote post!';
 export const TAGS_NOT_VALID = 'Each tag must start with a letter and not contain spaces!';
+export const POST_NOT_PUBLISHED = 'The post has not been published!';

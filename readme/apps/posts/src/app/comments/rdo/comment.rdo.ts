@@ -5,7 +5,7 @@ import { Expose } from "class-transformer";
 export class CommentRDO {
   @ApiProperty({
     description: 'Идентификатор комментария',
-    example: '63b1b72b07247fd1feca2cbc'
+    example: 10
   })
   @Expose()
   id: number;
