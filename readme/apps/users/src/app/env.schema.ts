@@ -42,4 +42,7 @@ export default Joi.object({
   UPLOAD_FILES_DIR: Joi
     .string()
     .required(),
+  POST_URL_PREFIX: Joi
+    .string()
+    .required(),
 });
