@@ -35,11 +35,14 @@ export class PostRepository implements CRUDRepository<PostEntity, number, Post> 
     return post;
   }
 
-  async findAllPublished(limit: number, skip: number, postCategory: PostCategory, sorting: SortingParams): Promise<Post[]> {
+  async findAllPublished(limit: number, skip: number, postCategory: PostCategory, tag: string, sorting: SortingParams): Promise<Post[]> {
     type QueryType = Parameters<typeof this.prismaService.post.findMany>[0];
 
     const query: QueryType = {
-      where: {postStatus: PostStatus.Published, postCategory: postCategory},
+      where: {
+        postStatus: PostStatus.Published,
+        postCategory: postCategory,
+      },
       include: {
         _count: {
           select: {likes: true, comments: true},
@@ -48,6 +51,15 @@ export class PostRepository implements CRUDRepository<PostEntity, number, Post> 
       skip,
       take: limit,
     };
+
+    if (tag) {
+      query.where = {
+        ...query.where,
+        tags: {
+          has: tag,
+        }
+      };
+    }
 
     const orderBy = [];
     if (sorting.sortByLikes) {
@@ -104,6 +116,7 @@ export class PostRepository implements CRUDRepository<PostEntity, number, Post> 
 
     return posts as Post[];
   }
+
 
   async findDraftByUserId(userId: string): Promise<Post[]> {
     const posts = await this.prismaService.post.findMany({

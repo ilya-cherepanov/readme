@@ -14,11 +14,17 @@ export class GeneralService {
   async get(query: GetPostsQuery) {
     const skip = query.page * query.quantity;
 
-    return this.postRepository.findAllPublished(query.quantity, skip, query.postCategory, {
-      sortByPublish: query.sortByPublish,
-      sortByComments: query.sortByComments,
-      sortByLikes: query.sortByLikes,
-    });
+    return this.postRepository.findAllPublished(
+      query.quantity,
+      skip,
+      query.postCategory,
+      query.tag,
+      {
+        sortByPublish: query.sortByPublish,
+        sortByComments: query.sortByComments,
+        sortByLikes: query.sortByLikes,
+      },
+    );
   }
 
   async getOne(id: number) {

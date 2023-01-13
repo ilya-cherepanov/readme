@@ -12,8 +12,8 @@ export class CreateLinkPostDTO {
     required: false,
   })
   @Transform(({value}) => transformTagArray(value))
-  @Matches(TAG_FORMAT, {each: true})
-  @Length(Tag.MinLength, Tag.MaxLength, {each: true, message: TAGS_NOT_VALID})
+  @Matches(TAG_FORMAT, {each: true, message: TAGS_NOT_VALID})
+  @Length(Tag.MinLength, Tag.MaxLength, {each: true})
   @IsString({each: true})
   @ArrayMaxSize(Tag.MaxCount)
   @IsArray()

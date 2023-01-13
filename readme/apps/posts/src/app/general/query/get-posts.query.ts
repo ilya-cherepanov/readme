@@ -1,9 +1,9 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { PostCategory } from "@readme/shared-types";
-import { Transform } from "class-transformer";
-import { IsEnum, IsInt, IsOptional, Min } from "class-validator";
-import { DEFAULT_POSTS_PER_PAGE } from "../../posts.constants";
-import { SortOrder } from "../../../../types/sort-order.enum";
+import { ApiProperty } from '@nestjs/swagger';
+import { PostCategory } from '@readme/shared-types';
+import { Transform } from 'class-transformer';
+import { IsEnum, IsInt, IsOptional, IsString, Length, Matches, Min } from 'class-validator';
+import { DEFAULT_POSTS_PER_PAGE, Tag, TAGS_NOT_VALID, TAG_FORMAT } from '../../posts.constants';
+import { SortOrder } from '../../../../types/sort-order.enum';
 
 
 export class GetPostsQuery {
@@ -77,4 +77,15 @@ export class GetPostsQuery {
   @IsEnum(PostCategory)
   @IsOptional()
   public postCategory?: PostCategory;
+
+  @ApiProperty({
+    description: 'Отфильтровать публикации по тегу',
+    example: 'рассвет',
+    required: false,
+  })
+  @Matches(TAG_FORMAT, {message: TAGS_NOT_VALID})
+  @Length(Tag.MinLength, Tag.MaxLength)
+  @IsString()
+  @IsOptional()
+  public tag?: string;
 }

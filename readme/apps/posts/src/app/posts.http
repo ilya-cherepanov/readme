@@ -3,7 +3,7 @@
 ###
 
 # Get posts
-GET http://localhost:3333/api/?sortByComments=desc&page=0 HTTP/1.1
+GET http://localhost:3333/api/?tag=nextjs&sortByPublish=asc&quantity=2 HTTP/1.1
 Content-Type: application/json
 
 ###
