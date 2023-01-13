@@ -31,6 +31,11 @@ Content-Type: image/jpg
 
 ###
 
+# Get avatar picture
+GET http://localhost:3334/avatar/0bc28bf7-c2cd-4f81-bf98-cf3983d76338.jpg
+
+###
+
 # Change password
 POST http://localhost:3334/api/auth/change-password HTTP/1.1
 Content-Type: application/json

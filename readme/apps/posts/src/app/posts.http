@@ -101,6 +101,11 @@ Authorization: Bearer {{accessToken}}
 
 ###
 
+# Get loaded photo
+GET http://localhost:3333/photo/c3b7de15-1000-4cef-aeee-c8b48b82eafc.jpg HTTP/1.1
+
+###
+
 # Create quote post
 POST http://localhost:3333/api/quote HTTP/1.1
 Content-Type: application/json
