@@ -1,6 +1,6 @@
 @accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzYjliODQ3MzMzN2ZjMzhhMjkxMWRkZiIsImVtYWlsIjoiam9obkBlbWFpbC5jb20iLCJuYW1lIjoiSm9obiBDb25ub3IiLCJpYXQiOjE2NzM1NTUxNTksImV4cCI6MTY3MzU1NTQ1OX0.cgKHy_pfBfLfj0JJm6S5RdpxZD_OC7Q3eJx_HjnWEh4
 
-@refreshToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzOTQ1NTYyZmQ3NDllN2I1MTU5NTBkZSIsImVtYWlsIjoiam9obkBlbWFpbC5jb20iLCJpYXQiOjE2NzI2Njc1ODQsImV4cCI6MTY3MzI3MjM4NH0.vkKo6Ng-fhsg5n6H3SOSvZl79INF07cSvjVC_4fcipU
+@refreshToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzYjliODQ3MzMzN2ZjMzhhMjkxMWRkZiIsImVtYWlsIjoiam9obkBlbWFpbC5jb20iLCJuYW1lIjoiSm9obiBDb25ub3IiLCJpYXQiOjE2NzM1NjgzNzksImV4cCI6MTY3NDE3MzE3OX0.pAPd-6o3DpjoWrytr0yaEdPG6sUPxAHDJhxQ6vxzQgc
 
 ###
 
@@ -9,7 +9,7 @@ POST http://localhost:3334/api/auth/register HTTP/1.1
 Content-Type: application/json
 
 {
-  "email": "john@email.com",
+  "email": "john@emailll.com",
   "name": "John Connor",
   "password": "123456",
   "repeatedPassword": "123456"
